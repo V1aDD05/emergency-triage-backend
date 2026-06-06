@@ -1,0 +1,50 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "gcc-debug",
+            "displayName": "GCC Debug",
+            "description": "Configure with GCC in Debug mode",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_STANDARD": "17",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "gcc-release",
+            "displayName": "GCC Release",
+            "description": "Configure with GCC in Release mode",
+            "inherits": "gcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "GCC 11.2.0 x86_64-linux-gnu",
+            "displayName": "GCC 11.2.0 x86_64-linux-gnu",
+            "description": "Using compilers: C = /usr/bin/gcc, CXX = /usr/bin/g++",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-debug",
+            "configurePreset": "gcc-debug"
+        },
+        {
+            "name": "build-release",
+            "configurePreset": "gcc-release"
+        }
+    ]
+}
