@@ -1,6 +1,6 @@
 # Emergency (Hospital) Triage System
 
-[![CI](https://github.com/V1aDD05/Emergency_triage/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/V1aDD05/Emergency_triage/actions/workflows/ci.yml)
+[![CI](https://github.com/V1aDD05/emergency-triage-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/V1aDD05/emergency-triage-backend/actions/workflows/ci.yml)
 
 Backend-сервис для распределения пострадавших по операционным
 
