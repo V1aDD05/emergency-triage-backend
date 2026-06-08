@@ -101,13 +101,19 @@ void handleGetPatientById(const httplib::Request &req, httplib::Response &res, c
 
         // 1. Преобразование строки в число с проверкой
         size_t pos;
-        // 1.1 Проверка беззнаковости (0...std::numeric_limits<uint64_t>::max())
+
+        // 1.1 Проверка наличия непустого ID, начинающегося не со знака '-'
+        if (id_str.empty() || id_str[0] == '-')
+        {
+            throw ValidationError("id", "Must be a non-negative integer");
+        }
+        // 1.2 Проверка беззнаковости (0...std::numeric_limits<uint64_t>::max()) и отсутствия нечисловых символов
         uint64_t id_raw = std::stoull(id_str, &pos);
         if (pos != id_str.size())
         {
-            throw ValidationError("id", "Must be a non-negative integer (no trailing characters)");
+            throw ValidationError("id", "Must contain only digits(no trailing characters)");
         }
-        // 1.2 Проверка попадания в диапазон значений `uint32_t`
+        // 1.3 Проверка попадания в диапазон значений `uint32_t`
         if (id_raw > std::numeric_limits<uint32_t>::max())
         {
             throw ValidationError("id", "Must be in range of <uint32_t> (0..4294967295)");
@@ -188,7 +194,7 @@ void setupHandlers(httplib::Server &svr, PatientStorage &storage) {
     svr.Post("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
         handlePostPatients(req,res,storage);
     });
-    svr.Get(R"(/patients/(\d+))", [&storage](const httplib::Request &req, httplib::Response &res) {
+    svr.Get(R"(/patients/([^/]+))", [&storage](const httplib::Request &req, httplib::Response &res) {
         handleGetPatientById(req,res,storage);
     });
     svr.Get("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
