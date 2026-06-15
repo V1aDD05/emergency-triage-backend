@@ -3,19 +3,16 @@
 // Десериализация Gender
 std::optional<Gender> deserialiseGender(const nlohmann::json &json, const std::string &key)
 {
-    // Если поле отсутствует или равно null - возвращаем nullopt ("не указан")
     if (!json.contains(key) || json[key].is_null())
     {
         return std::nullopt;
     }
 
-    // Если поле не строка - ошибка
     if (!json[key].is_string())
     {
         throw ValidationError(key, "must be a string");
     }
 
-    // Если строка имеет одно из корректных значений - возвращаем сформированное перечисление
     std::string str = json[key];
     if (str == "male")
     {
@@ -26,7 +23,6 @@ std::optional<Gender> deserialiseGender(const nlohmann::json &json, const std::s
         return Gender::Female;
     }
 
-    // Если строка имеет некорректное значение - ошибка
     throw ValidationError(key, "Invalid gender value: " + str);
 }
 
@@ -57,7 +53,6 @@ nlohmann::json serialiseJSON(const Patient &patient)
             break;
     }
 
-    // Добавление необязательных полей (при наличии)
     if (patient.age_.has_value())
     {
         json["age"] = *patient.age_;
