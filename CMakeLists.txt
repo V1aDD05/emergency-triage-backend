@@ -77,5 +77,5 @@ target_link_libraries(hospital_triage PRIVATE hospital_lib)
 
 if(BUILD_TESTS)
     enable_testing()
-    add_subdirectory(tests)
+    add_subdirectory(tests/unit)
 endif()
