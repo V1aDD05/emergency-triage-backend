@@ -22,6 +22,6 @@ jobs:
       - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DUSE_SQLITE=OFF
       - name: Build
-        run: cmake --build build --parallel 2
+        run: cmake --build build --parallel
       - name: Run tests
         run: cd build && ctest --output-on-failure
