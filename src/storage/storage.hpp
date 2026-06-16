@@ -1,5 +1,4 @@
-#ifndef STORAGE_HPP
-#define STORAGE_HPP
+#pragma once
 
 #include <unordered_map>
 #include <vector>
@@ -56,5 +55,3 @@ private:
     std::unordered_map<uint32_t, Patient> patientsStorage_;
     uint32_t nextId_ = 1;
 };
-
-#endif

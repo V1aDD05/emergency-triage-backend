@@ -1,5 +1,4 @@
-#ifndef HANDLERS_HPP
-#define HANDLERS_HPP
+#pragma once
 
 #include <httplib.h>                    // для HTTP сервера
 #include <nlohmann/json.hpp>            // для работы с JSON
@@ -20,5 +19,3 @@ void handleGetPatientById(const httplib::Request &req, httplib::Response &res, c
 
 // Обработчик GET /patients
 void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage);
-
-#endif

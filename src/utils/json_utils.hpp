@@ -1,5 +1,4 @@
-#ifndef JSON_UTILS_HPP
-#define JSON_UTILS_HPP
+#pragma once
 
 #include <nlohmann/json.hpp>
 #include <optional>
@@ -16,5 +15,3 @@ nlohmann::json serialiseJSON(const Patient& patient);
 
 // Сериализация опционального пациента (если нет значения, возвращает null)
 nlohmann::json serialiseJSON(const std::optional<Patient>& patient);
-
-#endif

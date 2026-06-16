@@ -1,5 +1,4 @@
-#ifndef ERRORS_HPP
-#define ERRORS_HPP
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -19,5 +18,3 @@ public:
         return full_message_.c_str();
     }
 };
-
-#endif
