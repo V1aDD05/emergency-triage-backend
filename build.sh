@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 cmake --preset gcc-debug
 cmake --build --preset build-debug
