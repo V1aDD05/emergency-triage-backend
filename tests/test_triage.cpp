@@ -3,6 +3,6 @@
 
 TEST(TriageTest, Dummy)
 {
-    // Заглушка – проверяем, что функция computePriority существует и возвращает 0.
+    // Stub, should be developed later
     EXPECT_EQ(computePriority(0), 0);
 }

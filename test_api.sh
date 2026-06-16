@@ -1,9 +1,8 @@
-## Скрипт для ручного тестирования HTTP API
 #!/bin/bash
 
 BASE_URL="http://localhost:8080"
 
-## Ручное тестирование обработчика 'POST /patients'
+## Manual testing 'POST /patients'
 echo "=== POST /patients (valid) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
@@ -58,7 +57,7 @@ curl -sS -X POST "$BASE_URL/patients" \
     -d '{"mask":13, "age":42, "sex":"alien"}' | jq '.'
 echo ""
 
-## Ручное тестирование обработчика 'GET /patients/{id}'
+## Manual testing 'GET /patients/{id}'
 echo "=== GET /patients/1 ==="
 curl -sS -X GET "$BASE_URL/patients/1" | jq '.'
 echo ""
@@ -80,7 +79,7 @@ curl -sS -X GET "$BASE_URL/patients/4294967296" | jq '.'
 echo ""
 
 
-## Ручное тестирование обработчика 'GET /patients'
+## Manual testing 'GET /patients'
 echo "=== GET /patients ==="
 curl -sS -X GET "$BASE_URL/patients" | jq '.'
 echo ""

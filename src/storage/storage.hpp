@@ -2,34 +2,32 @@
 
 #include <unordered_map>
 #include <vector>
-#include <chrono>   // for timestamp
-#include <cstdint>  // for uint32_t and uint8_t fields  
-#include <optional> // for 'age' and 'sex' fields
+#include <chrono>   
+#include <cstdint>    
+#include <optional> 
 
-// Перечисление для указания пола пациента
 enum class Gender : uint8_t {
     Male,
     Female
 };
 
-// Перечисление для отображения текущего статуса оказания помощи пациенту
 enum class PatientStatus : uint8_t
 {
-    OnTheWay,      // находится в карете скорой помощи
-    Waiting,       // находится в больнице, в очереди в операционную
-    InSurgery,     // находится на операции
-    IntensiveCare, // после операции переведён в реанимацию
-    Died           // умер
+    OnTheWay,      
+    Waiting,       
+    InSurgery,     
+    IntensiveCare, 
+    Died           
 };
 
 struct Patient {
-    std::chrono::system_clock::time_point timestamp_;   // время поступления запроса
-    uint32_t mask_;                                     // битовая маска симптомов (бит 0 – отсутствует, бит 1 – присутствует)
-    uint32_t id_;                                       // уникальный идентификатор пациента (автоинкрементный)
-    uint8_t priority_;                                  // приоритет (чем меньше число, тем выше приоритет)
-    PatientStatus status_;                              // статус пациента
-    std::optional<uint8_t> age_;                        // возраст (опционально)
-    std::optional<Gender> sex_;                         // пол (опционально)
+    std::chrono::system_clock::time_point timestamp_;   
+    uint32_t mask_;                                     
+    uint32_t id_;                                       
+    uint8_t priority_;                                  
+    PatientStatus status_;                              
+    std::optional<uint8_t> age_;                        
+    std::optional<Gender> sex_;                         
     
 
     Patient(const std::chrono::system_clock::time_point &ts, uint32_t mask, uint32_t id, uint8_t priority, PatientStatus status,
@@ -39,16 +37,12 @@ struct Patient {
 
 class PatientStorage {
 public:
-    // Добавление пациента при помощи информации, полученной от клиента "карета скорой помощи" (mask, age, sex)
-    // и от бизнес-логики (priority). Возвращает присвоенный пациенту ID.
     uint32_t addPatient(uint32_t mask, uint8_t priority,
                         std::optional<uint8_t> age = std::nullopt,
                         std::optional<Gender> sex = std::nullopt);
 
-    // Передача информации о конкретном пациенте
     std::optional<Patient> getPatient(uint32_t id) const;
 
-    // Передача информации обо всех пациентах в очереди
     std::vector<Patient> getAllPatients() const;        
 
 private:

@@ -1,6 +1,5 @@
 #include "json_utils.hpp"
 
-// Десериализация Gender
 std::optional<Gender> deserialiseGender(const nlohmann::json &json, const std::string &key)
 {
     if (!json.contains(key) || json[key].is_null())
@@ -26,7 +25,6 @@ std::optional<Gender> deserialiseGender(const nlohmann::json &json, const std::s
     throw ValidationError(key, "Invalid gender value: " + str);
 }
 
-// Сериализация существующего пациента
 nlohmann::json serialiseJSON(const Patient &patient)
 {
     nlohmann::json json;
@@ -65,11 +63,10 @@ nlohmann::json serialiseJSON(const Patient &patient)
     return json;
 }
 
-// Сериализация опционального пациента (если нет значения, возвращает null)
 nlohmann::json serialiseJSON(const std::optional<Patient> &patient)
 {
     if (!patient.has_value()) {
-        return nlohmann::json();    // возвращаем в JSON null
+        return nlohmann::json();
     }
     return serialiseJSON(*patient);
 }

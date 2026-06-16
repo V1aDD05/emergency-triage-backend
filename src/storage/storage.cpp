@@ -3,8 +3,6 @@
 #include <iterator>
 #include <vector>
 
-// Добавление пациента при помощи информации, полученной от клиента "карета скорой помощи". 
-// Возвращает присвоенный пациенту ID.
 uint32_t PatientStorage::addPatient(uint32_t mask, uint8_t priority,
                                     std::optional<uint8_t> age, std::optional<Gender> sex)
 {
@@ -16,7 +14,6 @@ uint32_t PatientStorage::addPatient(uint32_t mask, uint8_t priority,
     return patient.id_;
 }
 
-// Передача информации о конкретном пациенте
 std::optional<Patient> PatientStorage::getPatient(uint32_t id) const
 {
     auto it = patientsStorage_.find(id);
@@ -28,7 +25,6 @@ std::optional<Patient> PatientStorage::getPatient(uint32_t id) const
     return std::nullopt;
 }
 
-// Передача информации обо всех пациентах в очереди
 std::vector<Patient> PatientStorage::getAllPatients() const
 {
     std::vector<Patient> result;

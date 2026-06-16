@@ -2,15 +2,14 @@
 
 #include <optional>
 #include <string>
-#include <stdexcept>    // для std::invalid_argument
-#include <limits>       // для std::numeric_limits
+#include <stdexcept>    
+#include <limits>       
 
-// Обработчик POST /patients
 void handlePostPatients(const httplib::Request &req, httplib::Response &res, PatientStorage &storage) {
     try {
         auto json = nlohmann::json::parse(req.body);
 
-        // Извлечение маски
+        // mask extraction
         if (!json.contains("mask")) {
             throw ValidationError("mask", "Missing required field");
         }
@@ -27,7 +26,7 @@ void handlePostPatients(const httplib::Request &req, httplib::Response &res, Pat
 
         uint32_t mask = static_cast<uint32_t>(mask_raw);
 
-        // Извлечение возраста (опционально)
+        // age extraction
         std::optional<uint8_t> age = std::nullopt;
         if (json.contains("age") && !json["age"].is_null()){
 
@@ -45,37 +44,29 @@ void handlePostPatients(const httplib::Request &req, httplib::Response &res, Pat
             age = json["age"].get<uint8_t>();
         }
 
-        // Извлечение пола (опционально)
         std::optional<Gender> sex = deserialiseGender(json, "sex");
 
-        // Вычисление приоритета
         uint8_t priority = computePriority(mask);
 
-        // Добавление пациента
         uint32_t id = storage.addPatient(mask, priority, age, sex);
 
-        // TODO: На этапе 2 добавим здесь оценку времени пациента до операции,
-
-        // Случай успешного добавления записи о пациенте
-        nlohmann::json resp = {{"id", id}, {"estimated_wait_time", 0}}; // заглушка применительно ко времени ожидания
+        nlohmann::json resp = {{"id", id}, {"estimated_wait_time", 0}}; // TODO: remove stub for `estimated_wait_time` at the stage 3
         res.set_content(resp.dump(), "application/json");
         res.status = 201;
     }
-    // ОБРАБОТКА ИСКЛЮЧЕНИЙ
 
-    // обработка исключения, которое может быть выброшено при десериализации JSON
     catch (const nlohmann::json::parse_error& e) {
         res.status = 400;
         res.set_content("{\"error\":\"Invalid JSON format: " + std::string(e.what()) + "\"}", "application/json");
     }
 
-    // обработка исключений, которые могут быть выброшены при извлечении маски, возраста, пола
+    // mask, age, sex processing exceptions
     catch (const ValidationError &e) {
         res.status = 400;
         res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
     }
 
-    // обработка исключения, которое может быть выброшено при вычислении приоритета
+    // priority computing exception
     catch (const std::logic_error &e) {
         res.status = 500;
         res.set_content("{\"error\":\"Internal server error (business logic): " + std::string(e.what()) + "\"}", "application/json");
@@ -87,12 +78,11 @@ void handlePostPatients(const httplib::Request &req, httplib::Response &res, Pat
     }
 }
 
-// Обработчик GET patients/{id}
+
 void handleGetPatientById(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage) {
     try{
         std::string id_str = req.matches[1];
 
-        // Преобразование строки в число с проверкой
         size_t pos;
 
         if (id_str.empty() || id_str[0] == '-')
@@ -121,11 +111,9 @@ void handleGetPatientById(const httplib::Request &req, httplib::Response &res, c
 
         nlohmann::json json = serialiseJSON(patient);
         
-        // Случай успешного обнаружения пациента
         res.set_content(json.dump(), "application/json");
         res.status = 200;
     }
-    // ОБРАБОТКА ИСКЛЮЧЕНИЙ
 
     catch (const std::invalid_argument &e)
     {
@@ -146,7 +134,6 @@ void handleGetPatientById(const httplib::Request &req, httplib::Response &res, c
     }
 }
 
-// Обработчик GET /patients
 void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage) {
     try{
         std::vector<Patient> patients = storage.getAllPatients();
@@ -157,8 +144,6 @@ void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, c
             res.status = 200;
             return;
         }
-
-        // Случай непустого массива
 
         nlohmann::json array = nlohmann::json::array();
         for (const auto &patient : patients)
@@ -177,7 +162,6 @@ void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, c
     }
 }
 
-// Функция, регистрирующая обработчики на сервере
 void setupHandlers(httplib::Server &svr, PatientStorage &storage) {
     svr.Post("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
         handlePostPatients(req, res, storage);

@@ -1,9 +1,8 @@
 #include "triage.hpp"
 
-// Функция вычисления приоритета пациента на основе маски симптомов.
-// На этапе 1 - заглушка, всегда возвращает 0.
+// Stub, should be developed later
 uint8_t computePriority(uint32_t mask)
 {
-    (void)mask; // подавление предупреждения о неиспользуемом параметре
+    (void)mask;
     return 0;
 }

@@ -3,12 +3,11 @@
 #include <stdexcept>
 #include <string>
 
-// Класс собственного исключения с передачей имени поля
 class ValidationError : public std::exception {
 public:
     std::string field_;
     std::string message_;
-    mutable std::string full_message_;   // mutable, чтобы можно было менять в what() const
+    mutable std::string full_message_;   
 
     ValidationError(const std::string &fld, const std::string &msg)
         : field_(fld), message_(msg) {}

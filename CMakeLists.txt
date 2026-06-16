@@ -6,17 +6,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #---------------------------------------------------------
-#---------------------- Опции ----------------------------
+#---------------------- Options ----------------------------
 #---------------------------------------------------------
 option(BUILD_TESTS "Build unit tests" ON)
-option(USE_SQLITE "Use SQLite for persistence" OFF) #ON на 3-ем этапе
+option(USE_SQLITE "Use SQLite for persistence" OFF)
 
 #---------------------------------------------------------
-# Подключение внешних зависимостей при помощи FetchContent
+#----------- Connecting external dependencies ------------
 #---------------------------------------------------------
 include(FetchContent)
 
-#cpp-httplib (header-only)
+# cpp-httplib (header-only)
 FetchContent_Declare(
     httplib
     GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
@@ -32,7 +32,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-# Google Test (только если BUILD_TESTS)
+# Google Test
 if(BUILD_TESTS)
     FetchContent_Declare(
         googletest
@@ -42,15 +42,14 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 endif()
 
-#SQLite (только если USE_SQLITE)
+# SQLite
 if(USE_SQLITE)
     find_package(SQLite3 REQUIRED)
 endif()
 
 #---------------------------------------------------------
-# ------------- Основной исполняемый файл ----------------
+# -------------------- Library ---------------------------
 #---------------------------------------------------------
-# Библиотека с основной логикой (без main)
 add_library(hospital_lib STATIC
     src/api/handlers.cpp
     src/core/triage.cpp
@@ -70,7 +69,9 @@ if(USE_SQLITE)
     target_compile_definitions(hospital_lib PUBLIC USE_SQLITE=1)
 endif()
 
-# Исполняемый файл (точка входа)
+#---------------------------------------------------------
+# -------------------- Executable ---------------------------
+#---------------------------------------------------------
 add_executable(hospital_triage src/main.cpp)
 target_link_libraries(hospital_triage PRIVATE hospital_lib)
 
