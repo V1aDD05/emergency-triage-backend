@@ -14,4 +14,4 @@ void handlePostPatients(const httplib::Request& req, httplib::Response& res, Pat
 
 void handleGetPatientById(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage);
 
-void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage);
+void handleGetPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage);

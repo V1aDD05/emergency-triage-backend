@@ -5,161 +5,158 @@
 #include <stdexcept>    
 #include <limits>       
 
-void handlePostPatients(const httplib::Request &req, httplib::Response &res, PatientStorage &storage) {
-    try {
-        auto json = nlohmann::json::parse(req.body);
+void handlePostPatients(const httplib::Request &req, httplib::Response &res, PatientStorage &storage)
+try {
+    auto json = nlohmann::json::parse(req.body);
 
-        // mask extraction
-        if (!json.contains("mask")) {
-            throw ValidationError("mask", "Missing required field");
-        }
+    // mask extraction
+    if (!json.contains("mask")) {
+        throw ValidationError("mask", "Missing required field");
+    }
 
-        if (!json["mask"].is_number_unsigned()){
-            throw ValidationError("mask", "Must be a non-negative integer");
-        }
+    if (!json["mask"].is_number_unsigned()){
+        throw ValidationError("mask", "Must be a non-negative integer");
+    }
 
-        uint64_t mask_raw = json["mask"].get<uint64_t>();
-        if (mask_raw > std::numeric_limits<uint32_t>::max())
+    uint64_t mask_raw = json["mask"].get<uint64_t>();
+    if (mask_raw > std::numeric_limits<uint32_t>::max())
+    {
+        throw ValidationError("mask", "Must be in range of <uint32_t> (0..4294967295)");
+    }
+
+    uint32_t mask = static_cast<uint32_t>(mask_raw);
+
+    // age extraction
+    std::optional<uint8_t> age = std::nullopt;
+    if (json.contains("age") && !json["age"].is_null()){
+
+        if (!json["age"].is_number_unsigned())
         {
-            throw ValidationError("mask", "Must be in range of <uint32_t> (0..4294967295)");
+            throw ValidationError("age", "Must be a non-negative integer");
         }
 
-        uint32_t mask = static_cast<uint32_t>(mask_raw);
-
-        // age extraction
-        std::optional<uint8_t> age = std::nullopt;
-        if (json.contains("age") && !json["age"].is_null()){
-
-            if (!json["age"].is_number_unsigned())
-            {
-                throw ValidationError("age", "Must be a non-negative integer");
-            }
-
-            uint64_t age_raw = json["age"].get<uint64_t>();
-            if (age_raw > std::numeric_limits<uint8_t>::max())
-            {
-                throw ValidationError("age", "Must be in range of <uint8_t> (0..255)");
-            }
-
-            age = json["age"].get<uint8_t>();
+        uint64_t age_raw = json["age"].get<uint64_t>();
+        if (age_raw > std::numeric_limits<uint8_t>::max())
+        {
+            throw ValidationError("age", "Must be in range of <uint8_t> (0..255)");
         }
 
-        std::optional<Gender> sex = deserialiseGender(json, "sex");
-
-        uint8_t priority = computePriority(mask);
-
-        uint32_t id = storage.addPatient(mask, priority, age, sex);
-
-        nlohmann::json resp = {{"id", id}, {"estimated_wait_time", 0}}; // TODO: remove stub for `estimated_wait_time` at the stage 3
-        res.set_content(resp.dump(), "application/json");
-        res.status = 201;
+        age = json["age"].get<uint8_t>();
     }
 
-    catch (const nlohmann::json::parse_error& e) {
-        res.status = 400;
-        res.set_content("{\"error\":\"Invalid JSON format: " + std::string(e.what()) + "\"}", "application/json");
-    }
+    std::optional<Gender> sex = deserialiseGender(json, "sex");
 
-    // mask, age, sex processing exceptions
-    catch (const ValidationError &e) {
-        res.status = 400;
-        res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
-    }
+    uint8_t priority = computePriority(mask);
 
-    // priority computing exception
-    catch (const std::logic_error &e) {
-        res.status = 500;
-        res.set_content("{\"error\":\"Internal server error (business logic): " + std::string(e.what()) + "\"}", "application/json");
-    }
+    uint32_t id = storage.addPatient(mask, priority, age, sex);
 
-    catch (const std::exception& e) {
-        res.status = 500;
-        res.set_content("{\"error\":\"Internal server error\"}", "application/json");
-    }
+    nlohmann::json resp = {{"id", id}, {"estimated_wait_time", 0}}; // TODO: remove stub for `estimated_wait_time` at the stage 3
+    res.set_content(resp.dump(), "application/json");
+    res.status = 201;
+}
+
+catch (const nlohmann::json::parse_error& e) {
+    res.status = 400;
+    res.set_content("{\"error\":\"Invalid JSON format: " + std::string(e.what()) + "\"}", "application/json");
+}
+
+// mask, age, sex processing exceptions
+catch (const ValidationError &e) {
+    res.status = 400;
+    res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
+}
+
+// priority computing exception
+catch (const std::logic_error &e) {
+    res.status = 500;
+    res.set_content("{\"error\":\"Internal server error (business logic): " + std::string(e.what()) + "\"}", "application/json");
+}
+
+catch (const std::exception& e) {
+    res.status = 500;
+    res.set_content("{\"error\":\"Internal server error\"}", "application/json");
 }
 
 
-void handleGetPatientById(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage) {
-    try{
-        std::string id_str = req.matches[1];
+void handleGetPatientById(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage)
+try{
+    std::string id_str = req.matches[1];
 
-        size_t pos;
+    size_t pos;
 
-        if (id_str.empty() || id_str[0] == '-')
-        {
-            throw ValidationError("id", "Must be a non-negative integer");
-        }
+    if (id_str.empty() || id_str[0] == '-')
+    {
+        throw ValidationError("id", "Must be a non-negative integer");
+    }
 
-        uint64_t id_raw = std::stoull(id_str, &pos);
-        if (pos != id_str.size())
-        {
-            throw ValidationError("id", "Must contain only digits(no trailing characters)");
-        }
+    uint64_t id_raw = std::stoull(id_str, &pos);
+    if (pos != id_str.size())
+    {
+        throw ValidationError("id", "Must contain only digits(no trailing characters)");
+    }
 
-        if (id_raw > std::numeric_limits<uint32_t>::max())
-        {
-            throw ValidationError("id", "Must be in range of <uint32_t> (0..4294967295)");
-        }
-        uint32_t id = static_cast<uint32_t>(id_raw);
+    if (id_raw > std::numeric_limits<uint32_t>::max())
+    {
+        throw ValidationError("id", "Must be in range of <uint32_t> (0..4294967295)");
+    }
+    uint32_t id = static_cast<uint32_t>(id_raw);
 
-        auto patient = storage.getPatient(id);
-        if (!patient) {
-            res.status = 404;
-            res.set_content("{\"error\":\"Patient not found\"}", "application/json");
-            return;
-        }
+    auto patient = storage.getPatient(id);
+    if (!patient) {
+        res.status = 404;
+        res.set_content("{\"error\":\"Patient not found\"}", "application/json");
+        return;
+    }
 
-        nlohmann::json json = serialiseJSON(patient);
+    nlohmann::json json = serialiseJSON(patient);
         
-        res.set_content(json.dump(), "application/json");
-        res.status = 200;
-    }
-
-    catch (const std::invalid_argument &e)
-    {
-        res.status = 400;
-        res.set_content("{\"error\":\"Invalid patient ID\"}", "application/json");
-    }
-
-    catch (const ValidationError &e)
-    {
-        res.status = 400;
-        res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
-    }
-
-    catch (const std::exception &e)
-    {
-        res.status = 500;
-        res.set_content("{\"error\":\"Internal server error\"}", "application/json");
-    }
+    res.set_content(json.dump(), "application/json");
+    res.status = 200;
 }
 
-void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage) {
-    try{
-        std::vector<Patient> patients = storage.getAllPatients();
+catch (const std::invalid_argument &e)
+{
+    res.status = 400;
+    res.set_content("{\"error\":\"Invalid patient ID\"}", "application/json");
+}
 
-        if (patients.empty())
-        {
-            res.set_content("[]", "application/json");
-            res.status = 200;
-            return;
-        }
+catch (const ValidationError &e)
+{
+    res.status = 400;
+    res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
+}
 
-        nlohmann::json array = nlohmann::json::array();
-        for (const auto &patient : patients)
-        {
-            array.push_back(serialiseJSON(patient));
-        }
+catch (const std::exception &e)
+{
+    res.status = 500;
+    res.set_content("{\"error\":\"Internal server error\"}", "application/json");
+}
 
-        res.set_content(array.dump(), "application/json");
-        res.status = 200;
-    }
+void handleGetPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage)
+try{
+    std::vector<Patient> patients = storage.getAllPatients();
 
-    catch (const std::exception &e)
+    if (patients.empty())
     {
-        res.status = 500;
-        res.set_content("{\"error\":\"Internal server error\"}", "application/json");
+        res.set_content("[]", "application/json");
+        res.status = 200;
+        return;
     }
+
+    nlohmann::json array = nlohmann::json::array();
+    for (const auto &patient : patients)
+    {
+        array.push_back(serialiseJSON(patient));
+    }
+
+    res.set_content(array.dump(), "application/json");
+    res.status = 200;
+}
+
+catch (const std::exception &e)
+{
+    res.status = 500;
+    res.set_content("{\"error\":\"Internal server error\"}", "application/json");
 }
 
 void setupHandlers(httplib::Server &server, PatientStorage &storage) {
@@ -169,6 +166,6 @@ void setupHandlers(httplib::Server &server, PatientStorage &storage) {
         handleGetPatientById(req, res, storage);
     });
     server.Get("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
-        handleGetAllPatients(req, res, storage);
+        handleGetPatients(req, res, storage);
     });
 }
