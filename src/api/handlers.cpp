@@ -101,7 +101,7 @@ try{
     }
     uint32_t id = static_cast<uint32_t>(id_raw);
 
-    auto patient = storage.getPatient(id);
+    const auto patient = storage.getPatient(id);
     if (!patient) {
         res.status = 404;
         res.set_content("{\"error\":\"Patient not found\"}", "application/json");
@@ -134,7 +134,7 @@ catch (const std::exception &e)
 
 void handleGetPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage)
 try{
-    std::vector<Patient> patients = storage.getAllPatients();
+    const std::vector<Patient> patients = storage.getAllPatients();
 
     if (patients.empty())
     {
