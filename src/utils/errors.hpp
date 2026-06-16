@@ -1,17 +1,11 @@
 #pragma once
 
 #include <stdexcept>
+#include <format>
 #include <string>
 
-class ValidationError : public std::exception {
+class ValidationError : public std::runtime_error {
 public:  
-    ValidationError(const std::string &field, const std::string &message) {
-        message_ = "Field '" + field + "': " + message;
-    }
-
-    const char* what() const noexcept override {
-        return message_.c_str();
-    }
-private:
-    std::string message_;
+    ValidationError(const std::string &field, const std::string &message) : 
+    std::runtime_error(std::format("Field '{}': {}", field, message)) {}
 };
