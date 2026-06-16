@@ -6,9 +6,9 @@
 int main()
 {
     PatientStorage storage;
-    httplib::Server svr;
-    setupHandlers(svr, storage);
+    httplib::Server server;
+    setupHandlers(server, storage);
     std::cout << "Server started on http://localhost:8080" << std::endl;
-    svr.listen("0.0.0.0", 8080);
+    server.listen("0.0.0.0", 8080);
     return 0;
 }

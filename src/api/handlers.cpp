@@ -162,14 +162,13 @@ void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, c
     }
 }
 
-void setupHandlers(httplib::Server &svr, PatientStorage &storage) {
-    svr.Post("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
-        handlePostPatients(req, res, storage);
-    });
-    svr.Get(R"(/patients/([^/]+))", [&storage](const httplib::Request &req, httplib::Response &res) {
+void setupHandlers(httplib::Server &server, PatientStorage &storage) {
+    server.Post("/patients", [&storage](const httplib::Request &req, httplib::Response &res){
+        handlePostPatients(req, res, storage); });
+    server.Get(R"(/patients/([^/]+))", [&storage](const httplib::Request &req, httplib::Response &res) {
         handleGetPatientById(req, res, storage);
     });
-    svr.Get("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
+    server.Get("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
         handleGetAllPatients(req, res, storage);
     });
 }

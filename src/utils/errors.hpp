@@ -9,8 +9,8 @@ public:
     std::string message_;
     mutable std::string full_message_;   
 
-    ValidationError(const std::string &fld, const std::string &msg)
-        : field_(fld), message_(msg) {}
+    ValidationError(const std::string &field, const std::string &message)
+        : field_(field), message_(message) {}
 
     const char* what() const noexcept override {
         full_message_ = "Field '" + field_ + "': " + message_;

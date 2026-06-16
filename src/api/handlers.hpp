@@ -6,9 +6,9 @@
 #include "storage/storage.hpp"          
 #include "core/triage.hpp"              
 #include "utils/errors.hpp"             
-#include "utils/json_utils.hpp"         
+#include "utils/json_utils.hpp"
 
-void setupHandlers(httplib::Server &svr, PatientStorage &storage);
+void setupHandlers(httplib::Server &server, PatientStorage &storage);
 
 void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage);
 

@@ -30,9 +30,9 @@ struct Patient {
     std::optional<Gender> sex_;                         
     
 
-    Patient(const std::chrono::system_clock::time_point &ts, uint32_t mask, uint32_t id, uint8_t priority, PatientStatus status,
+    Patient(const std::chrono::system_clock::time_point &timestamp, uint32_t mask, uint32_t id, uint8_t priority, PatientStatus status,
             std::optional<uint8_t> age = std::nullopt, std::optional<Gender> sex = std::nullopt)
-        : timestamp_(ts), mask_(mask), id_(id), priority_(priority), status_(status), age_(age), sex_(sex) {}
+        : timestamp_(timestamp), mask_(mask), id_(id), priority_(priority), status_(status), age_(age), sex_(sex) {}
 };
 
 class PatientStorage {
