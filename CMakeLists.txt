@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Опции
+#---------------------------------------------------------
+#---------------------- Опции ----------------------------
+#---------------------------------------------------------
 option(BUILD_TESTS "Build unit tests" ON)
 option(USE_SQLITE "Use SQLite for persistence" OFF) #ON на 3-ем этапе
 
@@ -45,9 +47,9 @@ if(USE_SQLITE)
     find_package(SQLite3 REQUIRED)
 endif()
 
-#--------------------------
-# Основной исполняемый файл
-#--------------------------
+#---------------------------------------------------------
+# ------------- Основной исполняемый файл ----------------
+#---------------------------------------------------------
 # Библиотека с основной логикой (без main)
 add_library(hospital_lib STATIC
     src/api/handlers.cpp
@@ -76,4 +78,3 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
-

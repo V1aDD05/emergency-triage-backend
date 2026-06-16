@@ -118,4 +118,3 @@ flowchart TD
 - **500 (Internal Server Error)** - внутренняя ошибка сервера;
 
 ---
-

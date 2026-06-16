@@ -9,7 +9,6 @@
 
 // Перечисление для указания пола пациента
 enum class Gender : uint8_t {
-
     Male,
     Female
 };

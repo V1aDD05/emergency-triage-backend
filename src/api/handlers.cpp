@@ -180,12 +180,12 @@ void handleGetAllPatients(const httplib::Request &req, httplib::Response &res, c
 // Функция, регистрирующая обработчики на сервере
 void setupHandlers(httplib::Server &svr, PatientStorage &storage) {
     svr.Post("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
-        handlePostPatients(req,res,storage);
+        handlePostPatients(req, res, storage);
     });
     svr.Get(R"(/patients/([^/]+))", [&storage](const httplib::Request &req, httplib::Response &res) {
-        handleGetPatientById(req,res,storage);
+        handleGetPatientById(req, res, storage);
     });
     svr.Get("/patients", [&storage](const httplib::Request &req, httplib::Response &res) {
-        handleGetAllPatients(req,res,storage);
+        handleGetAllPatients(req, res, storage);
     });
 }
