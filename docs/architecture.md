@@ -13,7 +13,7 @@ flowchart TD
 
     subgraph "HTTP API"
         A["handlers.hpp/.cpp\nОбработчики запросов"]
-        B["json_utils.hpp/.cpp\nСериализация и десериализация\nпри работе с JSON"]
+        B["json_serialisation.hpp/.cpp\nСериализация и десериализация\nпри работе с JSON"]
         C["errors.hpp\nИсключение с передачей\nимени поля"]
     end
 
