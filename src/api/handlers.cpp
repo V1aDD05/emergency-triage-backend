@@ -5,7 +5,38 @@
 #include <stdexcept>
 #include <string>
 
-void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) try {
+void commonExceptionHandler(const httplib::Request& req, httplib::Response& res, std::exception_ptr ep) {
+    [[maybe_unused]] req;
+    try {
+        std::rethrow_exception(ep);
+    }
+    // mask, age, sex processing exceptions
+    catch (const ValidationError& e) {
+        res.status = 400;
+        res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
+    }
+    catch (const nlohmann::json::parse_error& e) {
+        res.status = 400;
+        res.set_content("{\"error\":\"Invalid JSON format: " + std::string(e.what()) + "\"}", "application/json");
+    }
+    catch (const std::invalid_argument& e) {
+        res.status = 400;
+        res.set_content("{\"error\":\"Invalid patient ID\"}", "application/json");
+    }
+    // priority computing exception
+    catch (const std::logic_error& e) {
+        res.status = 500;
+        res.set_content("{\"error\":\"Internal server error (business logic): " + std::string(e.what()) + "\"}",
+                        "application/json");
+    }
+    catch (const std::exception& e) {
+        res.status = 500;
+        res.set_content("{\"error\":\"Internal server error\"}", "application/json");
+    }
+
+}
+
+void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) {
     auto json = nlohmann::json::parse(req.body);
 
     // mask extraction
@@ -53,30 +84,7 @@ void handlePostPatients(const httplib::Request& req, httplib::Response& res, Pat
     res.status = 201;
 }
 
-catch (const nlohmann::json::parse_error& e) {
-    res.status = 400;
-    res.set_content("{\"error\":\"Invalid JSON format: " + std::string(e.what()) + "\"}", "application/json");
-}
-
-// mask, age, sex processing exceptions
-catch (const ValidationError& e) {
-    res.status = 400;
-    res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
-}
-
-// priority computing exception
-catch (const std::logic_error& e) {
-    res.status = 500;
-    res.set_content("{\"error\":\"Internal server error (business logic): " + std::string(e.what()) + "\"}",
-                    "application/json");
-}
-
-catch (const std::exception& e) {
-    res.status = 500;
-    res.set_content("{\"error\":\"Internal server error\"}", "application/json");
-}
-
-void handleGetPatientById(const httplib::Request& req, httplib::Response& res, const PatientStorage& storage) try {
+void handleGetPatientById(const httplib::Request& req, httplib::Response& res, const PatientStorage& storage) {
     std::string id_str = req.matches[1];
 
     size_t pos;
@@ -98,7 +106,7 @@ void handleGetPatientById(const httplib::Request& req, httplib::Response& res, c
     const auto patient = storage.getPatient(id);
     if (!patient) {
         res.status = 404;
-        res.set_content("{\"error\":\"Patient not found\"}", "application/ json");
+        res.set_content("{\"error\":\"Patient not found\"}", "application/json");
         return;
     }
 
@@ -108,22 +116,7 @@ void handleGetPatientById(const httplib::Request& req, httplib::Response& res, c
     res.status = 200;
 }
 
-catch (const std::invalid_argument& e) {
-    res.status = 400;
-    res.set_content("{\"error\":\"Invalid patient ID\"}", "application/json");
-}
-
-catch (const ValidationError& e) {
-    res.status = 400;
-    res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
-}
-
-catch (const std::exception& e) {
-    res.status = 500;
-    res.set_content("{\"error\":\"Internal server error\"}", "application/ json");
-}
-
-void handleGetPatients(const httplib::Request& req, httplib::Response& res, const PatientStorage& storage) try {
+void handleGetPatients(const httplib::Request& req, httplib::Response& res, const PatientStorage& storage) {
     const std::vector<Patient> patients = storage.getAllPatients();
 
     if (patients.empty()) {
@@ -141,12 +134,8 @@ void handleGetPatients(const httplib::Request& req, httplib::Response& res, cons
     res.status = 200;
 }
 
-catch (const std::exception& e) {
-    res.status = 500;
-    res.set_content("{\"error\":\"Internal server error\"}", "application/json");
-}
-
 void setupHandlers(httplib::Server& server, PatientStorage& storage) {
+    server.set_exception_handler(commonExceptionHandler);
     server.Post("/patients", [&storage](const httplib::Request& req, httplib::Response& res) {
         handlePostPatients(req, res, storage);
     });
