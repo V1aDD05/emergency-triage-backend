@@ -1,12 +1,10 @@
 #pragma once
 
-#include <httplib.h>
-#include <nlohmann/json.hpp>
+#include <exception>
 
-#include "core/triage.hpp"
+#include <httplib.h>
+
 #include "storage/storage.hpp"
-#include "utils/errors.hpp"
-#include "utils/json_serialisation.hpp"
 
 void setupHandlers(httplib::Server &server, PatientStorage &storage);
 

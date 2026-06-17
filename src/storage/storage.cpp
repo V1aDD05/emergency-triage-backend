@@ -1,8 +1,5 @@
 #include "storage.hpp"
 
-#include <iterator>
-#include <vector>
-
 uint32_t PatientStorage::addPatient(uint32_t mask, uint8_t priority, std::optional<uint8_t> age,
                                     std::optional<Gender> sex) {
     auto now = std::chrono::system_clock::now();
