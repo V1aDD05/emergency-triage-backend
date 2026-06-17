@@ -2,6 +2,11 @@
 
 BASE_URL="http://localhost:8080"
 
+## Manual testing 'GET /patients' before adding any patient
+echo "=== GET /patients ==="
+curl -sS -X GET "$BASE_URL/patients" | jq '.'
+echo ""
+
 ## Manual testing 'POST /patients'
 echo "=== POST /patients (valid) ==="
 curl -sS -X POST "$BASE_URL/patients" \
