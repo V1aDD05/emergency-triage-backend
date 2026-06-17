@@ -3,9 +3,8 @@
 #include <iterator>
 #include <vector>
 
-uint32_t PatientStorage::addPatient(uint32_t mask, uint8_t priority,
-                                    std::optional<uint8_t> age, std::optional<Gender> sex)
-{
+uint32_t PatientStorage::addPatient(uint32_t mask, uint8_t priority, std::optional<uint8_t> age,
+                                    std::optional<Gender> sex) {
     auto now = std::chrono::system_clock::now();
     PatientStatus status = PatientStatus::OnTheWay;
     Patient patient(now, mask, nextId_, priority, status, age, sex);
@@ -14,24 +13,20 @@ uint32_t PatientStorage::addPatient(uint32_t mask, uint8_t priority,
     return patient.id_;
 }
 
-std::optional<Patient> PatientStorage::getPatient(uint32_t id) const
-{
+std::optional<Patient> PatientStorage::getPatient(uint32_t id) const {
     auto it = patientsStorage_.find(id);
-    if (it != patientsStorage_.end())
-    {
+    if (it != patientsStorage_.end()) {
         return it->second;
     }
 
     return std::nullopt;
 }
 
-std::vector<Patient> PatientStorage::getAllPatients() const
-{
+std::vector<Patient> PatientStorage::getAllPatients() const {
     std::vector<Patient> result;
     result.reserve(patientsStorage_.size());
 
-    for (const auto &[id, patient] : patientsStorage_)
-    {
+    for (const auto& [id, patient] : patientsStorage_) {
         result.push_back(patient);
     }
 

@@ -1,0 +1,19 @@
+BasedOnStyle: Google
+IndentWidth: 4
+AccessModifierOffset: -4
+UseTab: Never
+ColumnLimit: 120
+BreakStringLiterals: false
+AllowAllArgumentsOnNextLine: true 
+AllowShortFunctionsOnASingleLine: None  
+BinPackArguments: false              
+PenaltyBreakString: 1000000
+SortIncludes: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<(nlohmann|httplib).*>'
+    Priority: 2
+  - Regex: '^<.*>'
+    Priority: 1
+  - Regex: '^".*"'
+    Priority: 3

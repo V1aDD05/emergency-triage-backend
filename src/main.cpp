@@ -1,10 +1,11 @@
 #include <iostream>
+
 #include <httplib.h>
+
 #include "api/handlers.hpp"
 #include "storage/storage.hpp"
 
-int main()
-{
+int main() {
     PatientStorage storage;
     httplib::Server server;
     setupHandlers(server, storage);

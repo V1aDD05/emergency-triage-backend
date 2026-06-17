@@ -1,37 +1,32 @@
 #include "json_utils.hpp"
 
-std::optional<Gender> deserialiseGender(const nlohmann::json &json, const std::string &key)
-{
-    if (!json.contains(key) || json[key].is_null())
-    {
+std::optional<Gender> deserialiseGender(const nlohmann::json &json, const std::string &key) {
+    if (!json.contains(key) || json[key].is_null()) {
         return std::nullopt;
     }
 
-    if (!json[key].is_string())
-    {
+    if (!json[key].is_string()) {
         throw ValidationError(key, "must be a string");
     }
 
     std::string str = json[key];
-    if (str == "male")
-    {
+    if (str == "male") {
         return Gender::Male;
     }
-    if (str == "female")
-    {
+    if (str == "female") {
         return Gender::Female;
     }
 
     throw ValidationError(key, "Invalid gender value: " + str);
 }
 
-nlohmann::json serialiseJSON(const Patient &patient)
-{
+nlohmann::json serialiseJSON(const Patient &patient) {
     nlohmann::json json;
     json["id"] = patient.id_;
     json["mask"] = patient.mask_;
     json["priority"] = patient.priority_;
-    json["timestamp"] = std::chrono::duration_cast<std::chrono::milliseconds>(patient.timestamp_.time_since_epoch()).count();
+    json["timestamp"] =
+        std::chrono::duration_cast<std::chrono::milliseconds>(patient.timestamp_.time_since_epoch()).count();
 
     switch (patient.status_) {
         case PatientStatus::OnTheWay:
@@ -51,20 +46,17 @@ nlohmann::json serialiseJSON(const Patient &patient)
             break;
     }
 
-    if (patient.age_.has_value())
-    {
+    if (patient.age_.has_value()) {
         json["age"] = *patient.age_;
     }
-    if (patient.sex_.has_value())
-    {
+    if (patient.sex_.has_value()) {
         json["sex"] = (*patient.sex_ == Gender::Male) ? "male" : "female";
     }
 
     return json;
 }
 
-nlohmann::json serialiseJSON(const std::optional<Patient> &patient)
-{
+nlohmann::json serialiseJSON(const std::optional<Patient> &patient) {
     if (!patient.has_value()) {
         return nlohmann::json();
     }
