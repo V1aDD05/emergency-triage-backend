@@ -6,7 +6,7 @@
 #include "core/triage.hpp"
 #include "storage/storage.hpp"
 #include "utils/errors.hpp"
-#include "utils/json_utils.hpp"
+#include "utils/json_serialisation.hpp"
 
 void setupHandlers(httplib::Server &server, PatientStorage &storage);
 

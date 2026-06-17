@@ -54,7 +54,7 @@ add_library(hospital_lib STATIC
     src/api/handlers.cpp
     src/core/triage.cpp
     src/storage/storage.cpp
-    src/utils/json_utils.cpp
+    src/utils/json_serialisation.cpp
 )
 
 target_include_directories(hospital_lib PUBLIC src)
