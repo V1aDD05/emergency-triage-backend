@@ -33,7 +33,6 @@ void commonExceptionHandler(const httplib::Request& req, httplib::Response& res,
         res.status = 500;
         res.set_content("{\"error\":\"Internal server error\"}", "application/json");
     }
-
 }
 
 void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) {
