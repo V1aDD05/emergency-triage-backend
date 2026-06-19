@@ -58,7 +58,13 @@ add_library(hospital_lib STATIC
     src/utils/json_serialisation.cpp
 )
 
-target_include_directories(hospital_lib PUBLIC src)
+target_include_directories(hospital_lib 
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
 target_link_libraries(hospital_lib
     PUBLIC
         httplib

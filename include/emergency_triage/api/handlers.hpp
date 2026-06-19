@@ -4,7 +4,9 @@
 
 #include <httplib.h>
 
-#include "storage/storage.hpp"
+#include "emergency_triage/storage/storage.hpp"
+
+namespace emergency_triage {
 
 void setupHandlers(httplib::Server &server, PatientStorage &storage);
 
@@ -15,3 +17,5 @@ void handlePostPatients(const httplib::Request &req, httplib::Response &res, Pat
 void handleGetPatientById(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage);
 
 void handleGetPatients(const httplib::Request &req, httplib::Response &res, const PatientStorage &storage);
+
+}

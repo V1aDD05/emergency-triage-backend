@@ -2,7 +2,11 @@
 
 #include <cstdint>
 
-#include "storage/data_structures.hpp"
+#include "emergency_triage/storage/data_structures.hpp"
+
+namespace emergency_triage {
 
 // Stub, should be developed later
 uint8_t computePriority(const EmergencyParams& emergencyParams, const TriageData& triageData);
+
+}

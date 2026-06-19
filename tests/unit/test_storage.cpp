@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "storage/storage.hpp"
+#include "emergency_triage/storage/storage.hpp"
 
 TEST(StorageTest, Dummy) {
     // Stub, should be developed later
-    PatientStorage storage;
-    EXPECT_EQ(storage.getAllPatients().size(), 0);
+	emergency_triage::PatientStorage storage;
+	EXPECT_EQ(storage.getAllPatients().size(), 0);
 }

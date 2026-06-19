@@ -1,7 +1,9 @@
 BasedOnStyle: Google
 IndentWidth: 4
+TabWidth: 4
 AccessModifierOffset: -4
-UseTab: Never
+UseTab: Always
+NamespaceIndentation: Inner
 ColumnLimit: 120
 BreakStringLiterals: false
 AllowAllArgumentsOnNextLine: true 
