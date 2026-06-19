@@ -15,7 +15,7 @@ void commonExceptionHandler(const httplib::Request& req, httplib::Response& res,
     try {
         std::rethrow_exception(ep);
     }
-    // mask, age, sex processing exceptions
+    // patient data processing exceptions
     catch (const ValidationError& e) {
         res.status = 400;
         nlohmann::json error = {{"error", e.what()}};

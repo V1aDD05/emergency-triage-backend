@@ -194,7 +194,7 @@ nlohmann::json serialiseJSON(const Patient& patient) {
             break;
     }
 
-    json["medical_data"]["emeregency_params"] = serialiseEmergencyParams(patient.getEmergencyParams());
+    json["medical_data"]["emergency_params"] = serialiseEmergencyParams(patient.getEmergencyParams());
     json["medical_data"]["triage_data"] = serialiseTriageData(patient.getTriageData());
     json["medical_data"]["demography_data"] = serialiseDemographyData(patient.getDemographyData());
 
