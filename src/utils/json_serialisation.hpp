@@ -6,13 +6,15 @@
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 
+#include "storage/data_structures.hpp"
 #include "storage/storage.hpp"
+#include "storage/patient.hpp"
 
-uint32_t deserialiseMask(const nlohmann::json& json, const std::string& key);
+EmergencyParams deserialiseEmergencyParams(const nlohmann::json& json);
 
-std::optional<uint8_t> deserialiseAge(const nlohmann::json& json, const std::string& key);
+TriageData deserialiseTriageData(const nlohmann::json& json);
 
-std::optional<Gender> deserialiseGender(const nlohmann::json& json, const std::string& key);
+DemographyData deserialiseDemographyData(const nlohmann::json& json);
 
 uint32_t deserialiseID(const httplib::Request& req);
 

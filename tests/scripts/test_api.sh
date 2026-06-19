@@ -11,55 +11,136 @@ echo ""
 echo "=== POST /patients (valid) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
-    -d '{"mask":13, "age":42, "sex":"male"}' | jq '.'
-echo ""
-
-echo "=== POST /patients (missing mask) ==="
-curl -sS -X POST "$BASE_URL/patients" \
-    -H "Content-Type: application/json" \
-    -d '{"age":42, "sex":"male"}' | jq '.'
-echo ""
-
-echo "=== POST /patients (negative mask) ==="
-curl -sS -X POST "$BASE_URL/patients" \
-    -H "Content-Type: application/json" \
-    -d '{"mask":-13, "age":42, "sex":"male"}' | jq '.'
-echo ""
-
-echo "=== POST /patients (mask out of bounds uint32_t) ==="
-curl -sS -X POST "$BASE_URL/patients" \
-    -H "Content-Type: application/json" \
-    -d '{"mask":4294967296, "age":42, "sex":"male"}' | jq '.'
-echo ""
-
-echo "=== POST /patients (mask is not an integer) ==="
-curl -sS -X POST "$BASE_URL/patients" \
-    -H "Content-Type: application/json" \
-    -d '{"mask":"abc", "age":42, "sex":"male"}' | jq '.'
+    -d '{
+        "emergency_params": {
+            "is_bleeding": false,
+            "is_extensive_wounds": false,
+            "is_penetrating_wounds": false,
+            "is_consciousness_depression": false,
+            "is_respiratory_depression": false,
+            "is_hemodynamic_depression": false,
+            "is_severe_combined_injury": false
+        },
+        "triage_data": {
+            "eye_response": 2,
+            "verbal_response": 2,
+            "motor_response": 2,
+            "respiratory_rate": 25,
+            "systolic_bp": 120
+        },
+        "demography_data": {
+            "age": 32,
+            "sex": "male"
+        }
+    }' | jq '.'
 echo ""
 
 echo "=== POST /patients (negative age) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
-    -d '{"mask":13, "age":-42, "sex":"male"}' | jq '.'
+    -d '{
+        "emergency_params": {
+            "is_bleeding": false,
+            "is_extensive_wounds": false,
+            "is_penetrating_wounds": false,
+            "is_consciousness_depression": false,
+            "is_respiratory_depression": false,
+            "is_hemodynamic_depression": false,
+            "is_severe_combined_injury": false
+        },
+        "triage_data": {
+            "eye_response": 2,
+            "verbal_response": 2,
+            "motor_response": 2,
+            "respiratory_rate": 25,
+            "systolic_bp": 120
+        },
+        "demography_data": {
+            "age": -32,
+            "sex": "male"
+        }
+    }' | jq '.'
 echo ""
 
 echo "=== POST /patients (age out of bounds uint8_t) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
-    -d '{"mask":13, "age":256, "sex":"male"}' | jq '.'
+    -d '{
+        "emergency_params": {
+            "is_bleeding": false,
+            "is_extensive_wounds": false,
+            "is_penetrating_wounds": false,
+            "is_consciousness_depression": false,
+            "is_respiratory_depression": false,
+            "is_hemodynamic_depression": false,
+            "is_severe_combined_injury": false
+        },
+        "triage_data": {
+            "eye_response": 2,
+            "verbal_response": 2,
+            "motor_response": 2,
+            "respiratory_rate": 25,
+            "systolic_bp": 120
+        },
+        "demography_data": {
+            "age": 256,
+            "sex": "male"
+        }
+    }' | jq '.'
 echo ""
 
 echo "=== POST /patients (age is not an integer) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
-    -d '{"mask":13, "age":"abc", "sex":"male"}' | jq '.'
+    -d '{
+        "emergency_params": {
+            "is_bleeding": false,
+            "is_extensive_wounds": false,
+            "is_penetrating_wounds": false,
+            "is_consciousness_depression": false,
+            "is_respiratory_depression": false,
+            "is_hemodynamic_depression": false,
+            "is_severe_combined_injury": false
+        },
+        "triage_data": {
+            "eye_response": 2,
+            "verbal_response": 2,
+            "motor_response": 2,
+            "respiratory_rate": 25,
+            "systolic_bp": 120
+        },
+        "demography_data": {
+            "age": "abc",
+            "sex": "male"
+        }
+    }' | jq '.'
 echo ""
 
 echo "=== POST /patients (invalid sex) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
-    -d '{"mask":13, "age":42, "sex":"alien"}' | jq '.'
+    -d '{
+        "emergency_params": {
+            "is_bleeding": false,
+            "is_extensive_wounds": false,
+            "is_penetrating_wounds": false,
+            "is_consciousness_depression": false,
+            "is_respiratory_depression": false,
+            "is_hemodynamic_depression": false,
+            "is_severe_combined_injury": false
+        },
+        "triage_data": {
+            "eye_response": 2,
+            "verbal_response": 2,
+            "motor_response": 2,
+            "respiratory_rate": 25,
+            "systolic_bp": 120
+        },
+        "demography_data": {
+            "age": 32,
+            "sex": "alien"
+        }
+    }' | jq '.'
 echo ""
 
 ## Manual testing 'GET /patients/{id}'

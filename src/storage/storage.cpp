@@ -1,13 +1,14 @@
 #include "storage.hpp"
 
-uint32_t PatientStorage::addPatient(uint32_t mask, uint8_t priority, std::optional<uint8_t> age,
-                                    std::optional<Gender> sex) {
+#include <chrono>
+
+uint32_t PatientStorage::addPatient(const AmbulanceData& ambulanceData) {
     auto now = std::chrono::system_clock::now();
     PatientStatus status = PatientStatus::OnTheWay;
-    Patient patient(now, mask, nextId_, priority, status, age, sex);
-    patientsStorage_.insert({patient.id_, patient});
+    Patient patient(nextId_, now, status, ambulanceData);
+    patientsStorage_.insert({patient.getId(), patient});
     ++nextId_;
-    return patient.id_;
+    return patient.getId();
 }
 
 std::optional<Patient> PatientStorage::getPatient(uint32_t id) const {
@@ -23,7 +24,7 @@ std::vector<Patient> PatientStorage::getAllPatients() const {
     std::vector<Patient> result;
     result.reserve(patientsStorage_.size());
 
-    for (const auto& [id, patient] : patientsStorage_) {
+    for (const auto& [_, patient] : patientsStorage_) {
         result.push_back(patient);
     }
 

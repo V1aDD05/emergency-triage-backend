@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "data_structures.hpp"
+#include "patient.hpp"
 
 class PatientStorage {
 public:
-    uint32_t addPatient(uint32_t mask, uint8_t priority, std::optional<uint8_t> age = std::nullopt,
-                        std::optional<Gender> sex = std::nullopt);
+    uint32_t addPatient(const AmbulanceData& ambulanceData);
 
     std::optional<Patient> getPatient(uint32_t id) const;
 

@@ -8,6 +8,7 @@
 #include "core/triage.hpp"
 #include "utils/errors.hpp"
 #include "utils/json_serialisation.hpp"
+#include "storage/data_structures.hpp"
 
 void commonExceptionHandler(const httplib::Request& req, httplib::Response& res, std::exception_ptr ep) {
     [[maybe_unused]] req;
@@ -17,40 +18,40 @@ void commonExceptionHandler(const httplib::Request& req, httplib::Response& res,
     // mask, age, sex processing exceptions
     catch (const ValidationError& e) {
         res.status = 400;
-        res.set_content("{\"error\":\"" + std::string(e.what()) + "\"}", "application/json");
+        nlohmann::json error = {{"error", e.what()}};
+        res.set_content(error.dump(), "application/json");
     }
     catch (const nlohmann::json::parse_error& e) {
         res.status = 400;
-        res.set_content("{\"error\":\"Invalid JSON format: " + std::string(e.what()) + "\"}", "application/json");
+        nlohmann::json error = {{"error", "Invalid JSON format: " + std::string(e.what())}};
+        res.set_content(error.dump(), "application/json");
     }
     catch (const std::invalid_argument& e) {
         res.status = 400;
-        res.set_content("{\"error\":\"Invalid argument\"}", "application/json");
+        nlohmann::json error = {{"error", "Invalid argument: " + std::string(e.what())}};
+        res.set_content(error.dump(), "application/json");
     }
     // priority computing exception
     catch (const std::logic_error& e) {
         res.status = 500;
-        res.set_content("{\"error\":\"Internal server error (business logic): " + std::string(e.what()) + "\"}",
-                        "application/json");
+        nlohmann::json error = {{"error", "Internal server error (business logic): " + std::string(e.what())}};
+        res.set_content(error.dump(), "application/json");
     }
     catch (const std::exception& e) {
         res.status = 500;
-        res.set_content("{\"error\":\"Internal server error\"}", "application/json");
+        nlohmann::json error = {{"error", "Internal server error: " + std::string(e.what())}};
+        res.set_content(error.dump(), "application/json");
     }
 }
 
 void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) {
     auto json = nlohmann::json::parse(req.body);
 
-    uint32_t mask = deserialiseMask(json, "mask");
+    AmbulanceData ambulanceData = {.emergency_params = deserialiseEmergencyParams(json["emergency_params"]),
+                                   .triage_data = deserialiseTriageData(json["triage_data"]),
+                                   .demography_data = deserialiseDemographyData(json["demography_data"])};
 
-    std::optional<uint8_t> age = deserialiseAge(json, "age");
-
-    std::optional<Gender> sex = deserialiseGender(json, "sex");
-
-    uint8_t priority = computePriority(mask);
-
-    uint32_t id = storage.addPatient(mask, priority, age, sex);
+    uint32_t id = storage.addPatient(ambulanceData);
 
     // TODO: remove stub for `estimated_wait_time` at the
     // stage 3
