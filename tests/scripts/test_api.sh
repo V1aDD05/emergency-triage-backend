@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-BASE_URL="http://localhost:8080"
+HOST="${SERVER_HOST:-127.0.0.1}"
+PORT="${SERVER_PORT:-8080}"
+BASE_URL="http://$HOST:$PORT"
 
 ## Manual testing 'GET /patients' before adding any patient
 echo "=== GET /patients ==="
