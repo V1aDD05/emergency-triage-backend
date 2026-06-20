@@ -29,7 +29,7 @@ jobs:
         run: |
           export SERVER_HOST=127.0.0.1
           export SERVER_PORT=8081
-          ./build/app/emergency_triage_app &
+          ./build/src/app/hospital_triage &
           sleep 2
           curl -f http://127.0.0.1/patients || exit 1
         
