@@ -31,5 +31,5 @@ jobs:
           export SERVER_PORT=8081
           ./build/src/app/hospital_triage &
           sleep 2
-          curl -f http://127.0.0.1/patients || exit 1
+          curl -f "http://${SERVER_HOST}:${SERVER_PORT}/patients" || exit 1
         
