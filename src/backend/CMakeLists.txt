@@ -17,6 +17,7 @@ target_link_libraries(hospital_backend
     PUBLIC
         httplib
         nlohmann_json::nlohmann_json
+        spdlog
 )
 
 if(USE_SQLITE)
