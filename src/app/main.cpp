@@ -2,6 +2,7 @@
 
 #include <httplib.h>
 
+#include "spdlog/spdlog.h"
 #include "emergency_triage/api/handlers.hpp"
 #include "emergency_triage/storage/storage.hpp"
 
@@ -11,7 +12,7 @@ int main() {
 	emergency_triage::PatientStorage storage;
 	httplib::Server server;
     setupHandlers(server, storage);
-    std::cout << "Server started on "<< host << ":" << port << std::endl;
+	spdlog::info("Server started on {}:{}", host, port);
 	server.listen(host, port);
 	return 0;
 }
