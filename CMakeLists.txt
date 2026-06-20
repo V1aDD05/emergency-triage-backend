@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-project(HospitalTriage VERSION 1.0 LANGUAGES CXX)
+    project(HospitalTriage VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -47,40 +47,11 @@ if(USE_SQLITE)
     find_package(SQLite3 REQUIRED)
 endif()
 
-#---------------------------------------------------------
-# -------------------- Library ---------------------------
-#---------------------------------------------------------
-add_library(hospital_lib STATIC
-    src/api/handlers.cpp
-    src/core/triage.cpp
-    src/storage/storage.cpp
-    src/storage/patient.cpp
-    src/utils/json_serialisation.cpp
-)
+# Library
+add_subdirectory(src/backend)
 
-target_include_directories(hospital_lib 
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
-target_link_libraries(hospital_lib
-    PUBLIC
-        httplib
-        nlohmann_json::nlohmann_json
-)
-
-if(USE_SQLITE)
-    target_link_libraries(hospital_lib PUBLIC SQLite::SQLite3)
-    target_compile_definitions(hospital_lib PUBLIC USE_SQLITE=1)
-endif()
-
-#---------------------------------------------------------
-# -------------------- Executable ---------------------------
-#---------------------------------------------------------
-add_executable(hospital_triage src/main.cpp)
-target_link_libraries(hospital_triage PRIVATE hospital_lib)
+# Executable
+add_subdirectory(src/app)
 
 if(BUILD_TESTS)
     enable_testing()

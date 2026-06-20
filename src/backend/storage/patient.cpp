@@ -2,8 +2,8 @@
 
 #include <optional>
 
-#include "core/triage.hpp"
 #include "emergency_triage/utils/errors.hpp"
+#include "core/triage.hpp"
 
 namespace emergency_triage {
 

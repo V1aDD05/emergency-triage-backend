@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "core/triage.hpp"
 #include "emergency_triage/storage/data_structures.hpp"
+#include "core/triage.hpp"
 
 TEST(TriageTest, Dummy) {
 	emergency_triage::EmergencyParams emergencyParams = {.is_bleeding = false,

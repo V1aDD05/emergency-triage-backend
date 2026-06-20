@@ -3,7 +3,7 @@
 #include <chrono>
 #include <cstdint>
 
-#include "data_structures.hpp"
+#include "emergency_triage/storage/data_structures.hpp"
 
 namespace emergency_triage {
 

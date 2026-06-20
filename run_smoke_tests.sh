@@ -5,7 +5,7 @@ echo "Killing any existing server..."
 pkill -f hospital_triage || true
 
 echo "Starting server..."
-./build/hospital_triage &
+./build/src/app/hospital_triage &
 SERVER_PID=$!
 
 trap "kill $SERVER_PID 2>/dev/null; pkill -f hospital_triage 2>/dev/null" EXIT

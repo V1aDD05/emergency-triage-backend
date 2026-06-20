@@ -1,4 +1,4 @@
-#include "triage.hpp"
+#include "core/triage.hpp"
 
 namespace emergency_triage {
 
