@@ -49,8 +49,8 @@ public:
 	void setDemographicData(const DemographicData& demographic_data);
 
 private:
-	const std::chrono::system_clock::time_point timestamp_;
-	const uint32_t id_;
+	std::chrono::system_clock::time_point timestamp_;
+	uint32_t id_;
 
 	uint8_t priority_;
 	PatientStatus status_;
