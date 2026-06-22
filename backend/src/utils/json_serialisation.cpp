@@ -174,8 +174,8 @@ nlohmann::json serialiseJSON(const Patient& patient) {
 	nlohmann::json json;
 	json["id"] = patient.getId();
 	json["priority"] = patient.getPriority();
-	json["timestamp"] =
-		std::chrono::duration_cast<std::chrono::milliseconds>(patient.getTimestamp().time_since_epoch()).count();
+	json["request_receipt_time"] =
+		std::chrono::duration_cast<std::chrono::milliseconds>(patient.getRequestReceiptTime().time_since_epoch()).count();
 
 	switch (patient.getStatus()) {
 		case PatientStatus::OnTheWay:

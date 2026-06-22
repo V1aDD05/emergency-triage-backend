@@ -12,7 +12,8 @@ namespace emergency_triage {
 
 class PatientStorage {
 public:
-	uint32_t addPatient(const PatientClientData& patientClientData);
+	uint32_t addPatient(const PatientClientData& patientClientData,
+						std::chrono::system_clock::time_point request_receipt_time, PatientStatus status);
 
 	std::optional<Patient> getPatient(uint32_t id) const;
 

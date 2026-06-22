@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <string>
+#include <chrono>
 
 #include <nlohmann/json.hpp>
 
@@ -46,13 +47,16 @@ void commonExceptionHandler(const httplib::Request& req, httplib::Response& res,
 }
 
 void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) {
+	auto requestReceiptTime = std::chrono::system_clock::now();
+	PatientStatus status = PatientStatus::OnTheWay;
+
 	auto json = catchValidationErrors([&]() { return nlohmann::json::parse(req.body); }, "body");
 
 	PatientClientData patientClientData = {.emergency_data = deserialiseEmergencyData(json["emergency_data"]),
 										   .triage_data = deserialiseTriageData(json["triage_data"]),
 										   .demographic_data = deserialiseDemographicData(json["demographic_data"])};
 
-	uint32_t id = storage.addPatient(patientClientData);
+	uint32_t id = storage.addPatient(patientClientData, requestReceiptTime, status);
 
 	// TODO: remove stub for `estimated_wait_time` at the
 	// stage 3

@@ -13,8 +13,8 @@ public:
 			const PatientClientData& patient_client_data);
 
 	// getters
-	std::chrono::system_clock::time_point getTimestamp() const noexcept {
-		return timestamp_;
+	std::chrono::system_clock::time_point getRequestReceiptTime() const noexcept {
+		return request_receipt_time_;
 	}
 
 	uint32_t getId() const noexcept {
@@ -49,7 +49,7 @@ public:
 	void setDemographicData(const DemographicData& demographic_data);
 
 private:
-	std::chrono::system_clock::time_point timestamp_;
+	std::chrono::system_clock::time_point request_receipt_time_;
 	uint32_t id_;
 
 	uint8_t priority_;

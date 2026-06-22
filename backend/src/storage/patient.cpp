@@ -7,9 +7,9 @@
 
 namespace emergency_triage {
 
-Patient::Patient(uint32_t id, std::chrono::system_clock::time_point timestamp, PatientStatus status,
+Patient::Patient(uint32_t id, std::chrono::system_clock::time_point request_receipt_time, PatientStatus status,
 				 const PatientClientData& patient_client_data)
-	: id_(id), timestamp_(timestamp) {
+	: id_(id), request_receipt_time_(request_receipt_time) {
 	setStatus(status);
 	setEmergencyData(patient_client_data.emergency_data);
 	setTriageData(patient_client_data.triage_data);
