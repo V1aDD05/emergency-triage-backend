@@ -49,11 +49,11 @@ void commonExceptionHandler(const httplib::Request& req, httplib::Response& res,
 void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) {
 	auto json = nlohmann::json::parse(req.body);
 
-	AmbulanceData ambulanceData = {.emergency_params = deserialiseEmergencyParams(json["emergency_params"]),
-								   .triage_data = deserialiseTriageData(json["triage_data"]),
-								   .demography_data = deserialiseDemographyData(json["demography_data"])};
+	PatientClientData patientClientData = {.emergency_data = deserialiseEmergencyData(json["emergency_data"]),
+										   .triage_data = deserialiseTriageData(json["triage_data"]),
+										   .demographic_data = deserialiseDemographicData(json["demographic_data"])};
 
-	uint32_t id = storage.addPatient(ambulanceData);
+	uint32_t id = storage.addPatient(patientClientData);
 
 	// TODO: remove stub for `estimated_wait_time` at the
 	// stage 3

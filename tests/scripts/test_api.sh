@@ -14,7 +14,7 @@ echo "=== POST /patients (valid) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
     -d '{
-        "emergency_params": {
+        "emergency_data": {
             "is_bleeding": false,
             "is_extensive_wounds": false,
             "is_penetrating_wounds": false,
@@ -30,7 +30,7 @@ curl -sS -X POST "$BASE_URL/patients" \
             "respiratory_rate": 25,
             "systolic_bp": 120
         },
-        "demography_data": {
+        "demographic_data": {
             "age": 32,
             "sex": "male"
         }
@@ -41,7 +41,7 @@ echo "=== POST /patients (negative age) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
     -d '{
-        "emergency_params": {
+        "emergency_data": {
             "is_bleeding": false,
             "is_extensive_wounds": false,
             "is_penetrating_wounds": false,
@@ -57,7 +57,7 @@ curl -sS -X POST "$BASE_URL/patients" \
             "respiratory_rate": 25,
             "systolic_bp": 120
         },
-        "demography_data": {
+        "demographic_data": {
             "age": -32,
             "sex": "male"
         }
@@ -68,7 +68,7 @@ echo "=== POST /patients (age out of bounds uint8_t) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
     -d '{
-        "emergency_params": {
+        "emergency_data": {
             "is_bleeding": false,
             "is_extensive_wounds": false,
             "is_penetrating_wounds": false,
@@ -84,7 +84,7 @@ curl -sS -X POST "$BASE_URL/patients" \
             "respiratory_rate": 25,
             "systolic_bp": 120
         },
-        "demography_data": {
+        "demographic_data": {
             "age": 256,
             "sex": "male"
         }
@@ -95,7 +95,7 @@ echo "=== POST /patients (age is not an integer) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
     -d '{
-        "emergency_params": {
+        "emergency_data": {
             "is_bleeding": false,
             "is_extensive_wounds": false,
             "is_penetrating_wounds": false,
@@ -111,7 +111,7 @@ curl -sS -X POST "$BASE_URL/patients" \
             "respiratory_rate": 25,
             "systolic_bp": 120
         },
-        "demography_data": {
+        "demographic_data": {
             "age": "abc",
             "sex": "male"
         }
@@ -122,7 +122,7 @@ echo "=== POST /patients (invalid sex) ==="
 curl -sS -X POST "$BASE_URL/patients" \
     -H "Content-Type: application/json" \
     -d '{
-        "emergency_params": {
+        "emergency_data": {
             "is_bleeding": false,
             "is_extensive_wounds": false,
             "is_penetrating_wounds": false,
@@ -138,7 +138,7 @@ curl -sS -X POST "$BASE_URL/patients" \
             "respiratory_rate": 25,
             "systolic_bp": 120
         },
-        "demography_data": {
+        "demographic_data": {
             "age": 32,
             "sex": "alien"
         }

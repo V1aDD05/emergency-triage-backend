@@ -87,8 +87,8 @@ namespace {
 	}
 }  // namespace
 
-EmergencyParams deserialiseEmergencyParams(const nlohmann::json& json) {
-	EmergencyParams result;
+EmergencyData deserialiseEmergencyData(const nlohmann::json& json) {
+	EmergencyData result;
 	result.is_bleeding = deserialiseBoolField(json, "is_bleeding");
 	result.is_consciousness_depression = deserialiseBoolField(json, "is_consciousness_depression");
 	result.is_extensive_wounds = deserialiseBoolField(json, "is_extensive_wounds");
@@ -109,8 +109,8 @@ TriageData deserialiseTriageData(const nlohmann::json& json) {
 	return result;
 }
 
-DemographyData deserialiseDemographyData(const nlohmann::json& json) {
-	DemographyData result;
+DemographicData deserialiseDemographicData(const nlohmann::json& json) {
+	DemographicData result;
 	result.age = deserialiseAge(json, "age");
 	result.sex = deserialiseGender(json, "sex");
 	return result;
@@ -137,15 +137,15 @@ uint32_t deserialiseID(const httplib::Request& req) {
 
 namespace {
 
-	nlohmann::json serialiseEmergencyParams(const EmergencyParams& emeregencyParams) {
+	nlohmann::json serialiseEmergencyData(const EmergencyData& emeregencyData) {
 		nlohmann::json json;
-		json["is_bleeding"] = emeregencyParams.is_bleeding;
-		json["is_extensive_wounds"] = emeregencyParams.is_extensive_wounds;
-		json["is_penetrating_wounds"] = emeregencyParams.is_penetrating_wounds;
-		json["is_consciousness_depression"] = emeregencyParams.is_consciousness_depression;
-		json["is_respiratory_depression"] = emeregencyParams.is_respiratory_depression;
-		json["is_hemodynamic_depression"] = emeregencyParams.is_hemodynamic_depression;
-		json["is_severe_combined_injury"] = emeregencyParams.is_severe_combined_injury;
+		json["is_bleeding"] = emeregencyData.is_bleeding;
+		json["is_extensive_wounds"] = emeregencyData.is_extensive_wounds;
+		json["is_penetrating_wounds"] = emeregencyData.is_penetrating_wounds;
+		json["is_consciousness_depression"] = emeregencyData.is_consciousness_depression;
+		json["is_respiratory_depression"] = emeregencyData.is_respiratory_depression;
+		json["is_hemodynamic_depression"] = emeregencyData.is_hemodynamic_depression;
+		json["is_severe_combined_injury"] = emeregencyData.is_severe_combined_injury;
 		return json;
 	}
 
@@ -159,13 +159,13 @@ namespace {
 		return json;
 	}
 
-	nlohmann::json serialiseDemographyData(const DemographyData& demographyData) {
+	nlohmann::json serialiseDemographicData(const DemographicData& demographicData) {
 		nlohmann::json json;
-		if (demographyData.age.has_value()) {
-			json["age"] = *demographyData.age;
+		if (demographicData.age.has_value()) {
+			json["age"] = *demographicData.age;
 		}
-		if (demographyData.sex.has_value()) {
-			json["sex"] = (*demographyData.sex == Gender::Male) ? "male" : "female";
+		if (demographicData.sex.has_value()) {
+			json["sex"] = (*demographicData.sex == Gender::Male) ? "male" : "female";
 		}
 		return json;
 	}
@@ -196,9 +196,9 @@ nlohmann::json serialiseJSON(const Patient& patient) {
 			break;
 	}
 
-	json["medical_data"]["emergency_params"] = serialiseEmergencyParams(patient.getEmergencyParams());
+	json["medical_data"]["emergency_params"] = serialiseEmergencyData(patient.getEmergencyData());
 	json["medical_data"]["triage_data"] = serialiseTriageData(patient.getTriageData());
-	json["medical_data"]["demography_data"] = serialiseDemographyData(patient.getDemographyData());
+	json["medical_data"]["demography_data"] = serialiseDemographicData(patient.getDemographicData());
 
 	return json;
 }

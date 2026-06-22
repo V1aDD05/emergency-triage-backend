@@ -12,11 +12,11 @@
 
 namespace emergency_triage {
 
-EmergencyParams deserialiseEmergencyParams(const nlohmann::json& json);
+EmergencyData deserialiseEmergencyData(const nlohmann::json& json);
 
 TriageData deserialiseTriageData(const nlohmann::json& json);
 
-DemographyData deserialiseDemographyData(const nlohmann::json& json);
+DemographicData deserialiseDemographicData(const nlohmann::json& json);
 
 uint32_t deserialiseID(const httplib::Request& req);
 

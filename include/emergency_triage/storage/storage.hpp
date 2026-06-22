@@ -11,7 +11,7 @@ namespace emergency_triage {
 
 class PatientStorage {
 public:
-	uint32_t addPatient(const AmbulanceData& ambulanceData);
+	uint32_t addPatient(const PatientClientData& patientClientData);
 
 	std::optional<Patient> getPatient(uint32_t id) const;
 

@@ -8,13 +8,13 @@
 namespace emergency_triage {
 
 Patient::Patient(uint32_t id, std::chrono::system_clock::time_point timestamp, PatientStatus status,
-				 const AmbulanceData& ambulance_data)
+				 const PatientClientData& patient_client_data)
 	: id_(id), timestamp_(timestamp) {
 	setStatus(status);
-	setEmergencyParams(ambulance_data.emergency_params);
-	setTriageData(ambulance_data.triage_data);
-	setDemographyData(ambulance_data.demography_data);
-	setPriority(computePriority(getEmergencyParams(), getTriageData()));
+	setEmergencyData(patient_client_data.emergency_data);
+	setTriageData(patient_client_data.triage_data);
+	setDemographicData(patient_client_data.demographic_data);
+	setPriority(computePriority(getEmergencyData(), getTriageData()));
 }
 
 // setters
@@ -32,8 +32,8 @@ void Patient::setStatus(PatientStatus status) {
 	}
 }
 
-void Patient::setEmergencyParams(const EmergencyParams& emergency_params) {
-	emergency_params_ = emergency_params;
+void Patient::setEmergencyData(const EmergencyData& emergency_data) {
+	emergency_data_ = emergency_data;
 }
 
 void Patient::setTriageData(const TriageData& triage_data) {
@@ -56,11 +56,11 @@ void Patient::setTriageData(const TriageData& triage_data) {
 	triage_data_ = triage_data;
 }
 
-void Patient::setDemographyData(const DemographyData& demography_data) {
-	if (demography_data.age.has_value() && *demography_data.age > 130) {
+void Patient::setDemographicData(const DemographicData& demographic_data) {
+	if (demographic_data.age.has_value() && *demographic_data.age > 130) {
 		throw ValidationError("age", "Must be in range [0..130]");
 	}
-	demography_data_ = demography_data;
+	demographic_data_ = demographic_data;
 }
 
 void Patient::setPriority(uint8_t priority) {

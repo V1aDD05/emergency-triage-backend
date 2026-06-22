@@ -4,7 +4,7 @@
 #include "core/triage.hpp"
 
 TEST(TriageTest, Dummy) {
-	emergency_triage::EmergencyParams emergencyParams = {.is_bleeding = false,
+	emergency_triage::EmergencyData emergencyData = {.is_bleeding = false,
 													   .is_extensive_wounds = false,
 													   .is_penetrating_wounds = false,
 													   .is_consciousness_depression = false,
@@ -20,5 +20,5 @@ TEST(TriageTest, Dummy) {
 	};
 
 	// Stub, should be developed later
-    EXPECT_EQ(computePriority(emergencyParams, triageData), 1);
+    EXPECT_EQ(computePriority(emergencyData, triageData), 1);
 }

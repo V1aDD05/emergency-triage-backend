@@ -7,6 +7,5 @@
 namespace emergency_triage {
 
 // Stub, should be developed later
-uint8_t computePriority(const EmergencyParams& emergencyParams, const TriageData& triageData);
-
+uint8_t computePriority(const EmergencyData& emergencyData, const TriageData& triageData);
 }

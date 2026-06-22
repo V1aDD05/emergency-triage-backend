@@ -12,7 +12,7 @@ enum class Gender : uint8_t { Male, Female };
 
 enum class PatientStatus : uint8_t { OnTheWay, Waiting, InSurgery, IntensiveCare, Died };
 
-struct EmergencyParams {
+struct EmergencyData {
 	bool is_bleeding = false;
 	bool is_extensive_wounds = false;
 	bool is_penetrating_wounds = false;
@@ -30,15 +30,15 @@ struct TriageData {
 	uint16_t systolic_bp = 0;
 };
 
-struct DemographyData {
+struct DemographicData {
 	std::optional<uint8_t> age;
 	std::optional<Gender> sex;
 };
 
-struct AmbulanceData {
-	EmergencyParams emergency_params;
+struct PatientClientData {
+	EmergencyData emergency_data;
 	TriageData triage_data;
-	DemographyData demography_data;
+	DemographicData demographic_data;
 };
 
 }  // namespace emergency_triage

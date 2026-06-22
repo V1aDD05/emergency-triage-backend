@@ -4,10 +4,10 @@
 
 namespace emergency_triage {
 
-uint32_t PatientStorage::addPatient(const AmbulanceData& ambulanceData) {
+uint32_t PatientStorage::addPatient(const PatientClientData& patientClientData) {
 	auto now = std::chrono::system_clock::now();
 	PatientStatus status = PatientStatus::OnTheWay;
-	Patient patient(nextId_, now, status, ambulanceData);
+	Patient patient(nextId_, now, status, patientClientData);
 	patientsStorage_.insert({patient.getId(), patient});
 	++nextId_;
 	return patient.getId();
