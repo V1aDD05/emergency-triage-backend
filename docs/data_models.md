@@ -79,7 +79,7 @@
 ### Поля класса
 |Поле|Тип|Описание|
 |----|---|--------|
-|`timestamp_`|`std::chrono::system_clock::time_point`|Время создания запроса (серверное)|
+|`request_receipt_time_`|`std::chrono::system_clock::time_point`|Время создания запроса `POST /patient` (серверное)|
 |`id_`|`uint32_t`|Уникальный идентификатор пациента (автоинкрементный)|
 |`priority_`|`uint8_t`|Приоритет пациента (чем меньше число, тем выше приоритет). Вычисляется бизнес-логикой на основе `EmergencyParams` и `TriageData`|
 |`status_`|`PatientStatus`|Статус пациента, подробнее ([см. выше](#перечисление-status))|
@@ -90,7 +90,7 @@
 ### Публичный интерфейс
 См. [здесь](/src/storage/storage.hpp)
 
-### Формат представления `timestamp` в `JSON`
+### Формат представления `request_receipt_time` в `JSON`
 Количество миллисекунд с `1970-01-01 UTC`. Например, `"timestamp": 1717588800000`
 
 ### JSON для запроса `POST /patients`
@@ -161,7 +161,7 @@
   },
   "priority": 1,
   "status": "on_the_way",
-  "timestamp": 1781864756743
+  "request_receipt_time": 1781864756743
 }
 ```
 
@@ -219,7 +219,7 @@
     },
     "priority": 2,
     "status": "on_the_way",
-    "timestamp": 1781864783743
+    "request_receipt_time": 1781864783743
   }
 ]
 

@@ -13,8 +13,7 @@ flowchart TD
 
     subgraph "HTTP API"
         A["handlers.hpp/.cpp\nОбработчики запросов"]
-        B["json_serialisation.hpp/.cpp\nСериализация и десериализация\nпри работе с JSON"]
-        C["errors.hpp\nИсключение с передачей\nимени поля"]
+        
     end
 
     subgraph "Бизнес-логика"
@@ -30,6 +29,15 @@ flowchart TD
         G["src/storage/patient.hpp/.cpp\nКласс `Patient`"]
     end
 
+    subgraph "Утилиты"
+        B["json_serialisation.hpp/.cpp\nСериализация и десериализация\nпри работе с JSON"]
+    end
+
+    subgraph "Обработка ошибок"
+        C["errors.hpp\nИерархия классов исключений"]
+        H["error_utils.hpp\nВспомогательные функции для работы с исключениями"]
+    end
+
     M --> A
     M --> E
     A --> B
@@ -40,7 +48,9 @@ flowchart TD
     E --> F
     E --> G
     B --> F
-    B --> G
+    G --> B
+    A --> H
+    B --> H
 
 ```
 
@@ -124,6 +134,8 @@ flowchart TD
     - **Недопустимое значение для перечислений**:
         - `sex` (если указано): только `"male"` или `"female"`.  
       *Пример:* `{"error": "Field 'sex': Invalid gender value: alien"}`
+
+- **409 (Conflict)** - конфликт запроса клиента и текущего состояния сервера.
 
 - **500 (Internal Server Error)** — внутренняя ошибка сервера (ошибка бизнес-логики или непредвиденное исключение).
 ---
