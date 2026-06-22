@@ -12,7 +12,7 @@ if curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/patients" | grep -q "200\|4
 fi
 
 echo "Port is free, starting server..."
-./build/src/app/hospital_triage &
+./build/app/hospital_triage &
 SERVER_PID=$!
 
 trap "kill $SERVER_PID 2>/dev/null || true" EXIT
