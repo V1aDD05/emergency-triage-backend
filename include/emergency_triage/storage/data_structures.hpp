@@ -41,14 +41,4 @@ struct AmbulanceData {
 	DemographyData demography_data;
 };
 
-/*
-NLOHMANN_JSON_SERIALIZE_ENUM_STRICT(Gender, {{Gender::Male, "male"}, {Gender::Female, "female"}})
-
-NLOHMANN_JSON_SERIALIZE_ENUM_STRICT(PatientStatus, {{PatientStatus::OnTheWay, "on_the_way"},
-													{PatientStatus::Waiting, "waiting"},
-													{PatientStatus::InSurgery, "in_surgery"},
-													{PatientStatus::IntensiveCare, "intensive_care"},
-													{PatientStatus::Died, "died"}})
-*/
-
 }  // namespace emergency_triage
