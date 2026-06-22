@@ -7,6 +7,7 @@
 #include <type_traits>
 
 #include "emergency_triage/utils/errors.hpp"
+#include "utils/error_utils.hpp"
 
 namespace {
 
@@ -158,7 +159,7 @@ uint32_t deserialiseID(const httplib::Request& req) {
 	}
 
 	size_t pos;
-	auto id_raw = std::stoull(id_str, &pos);
+	auto id_raw = catchValidationErrors([&]() { return std::stoull(id_str, &pos); }, "body");
 	if (pos != id_str.size()) {
 		throw ValidationError("id", "Must contain only digits (no trailing characters)");
 	}

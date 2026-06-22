@@ -7,54 +7,46 @@
 
 #include "core/triage.hpp"
 #include "emergency_triage/storage/data_structures.hpp"
+#include "utils/error_utils.hpp"
 #include "emergency_triage/utils/errors.hpp"
-#include "spdlog/spdlog.h"
 #include "utils/json_serialisation.hpp"
+#include "spdlog/spdlog.h"
 
-namespace {
+namespace emergency_triage {
+
 void commonExceptionHandler(const httplib::Request& req, httplib::Response& res, std::exception_ptr ep) {
 	[[maybe_unused]] req;
 	try {
 		std::rethrow_exception(ep);
 	}
-	// patient data processing exceptions
-	catch (const emergency_triage::ValidationError& e) {
-		res.status = 400;
-		nlohmann::json error = {{"error", e.what()}};
-		res.set_content(error.dump(), "application/json");
-	}
-	catch (const nlohmann::json::parse_error& e) {
-		res.status = 400;
-		nlohmann::json error = {{"error", "Invalid JSON format: " + std::string(e.what())}};
-		res.set_content(error.dump(), "application/json");
-	}
-	catch (const std::invalid_argument& e) {
-		res.status = 400;
-		nlohmann::json error = {{"error", "Invalid argument: " + std::string(e.what())}};
-		res.set_content(error.dump(), "application/json");
-	}
-	// priority computing exception
-	catch (const std::logic_error& e) {
-		spdlog::error("Internal server (business logic) error: {}", e.what());
+	catch (const emergency_triage::Exception& e) {
+		res.status = e.httpStatus();
+		nlohmann::json error;
+		if (e.isShowToClient()) {
+			error = {{"error", e.what()}};
+			if (res.status == 409) {
+				spdlog::warn(e.what());
+			} else {
+				spdlog::info(e.what());
+			}
+		} else {
+			error = {{"error", "Internal server error. Please try again later."}};
+			spdlog::error(e.what());
+		}
 
-		res.status = 500;
-		nlohmann::json error = {{"error", "Internal server error. Plase try again later."}};
 		res.set_content(error.dump(), "application/json");
 	}
 	catch (const std::exception& e) {
 		spdlog::error("Internal server error: {}", e.what());
 
 		res.status = 500;
-		nlohmann::json error = {{"error", "Internal server error. Plase try again later."}};
+		nlohmann::json error = {{"error", "Internal server error. Please try again later."}};
 		res.set_content(error.dump(), "application/json");
 	}
 }
-}
-
-namespace emergency_triage {
 
 void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) {
-	auto json = nlohmann::json::parse(req.body);
+	auto json = catchValidationErrors([&]() { return nlohmann::json::parse(req.body); }, "body");
 
 	PatientClientData patientClientData = {.emergency_data = deserialiseEmergencyData(json["emergency_data"]),
 										   .triage_data = deserialiseTriageData(json["triage_data"]),
