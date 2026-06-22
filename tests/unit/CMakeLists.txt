@@ -1,4 +1,4 @@
-set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../src/backend)
+set(SRC_DIR ${PROJECT_SOURCE_DIR}/backend/src)
 
 add_executable(unit_tests test_triage.cpp test_storage.cpp)
 target_link_libraries(unit_tests PRIVATE hospital_backend gtest_main)

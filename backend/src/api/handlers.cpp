@@ -7,10 +7,10 @@
 
 #include "core/triage.hpp"
 #include "emergency_triage/storage/data_structures.hpp"
-#include "utils/error_utils.hpp"
 #include "emergency_triage/utils/errors.hpp"
-#include "utils/json_serialisation.hpp"
 #include "spdlog/spdlog.h"
+#include "utils/error_utils.hpp"
+#include "utils/json_serialisation.hpp"
 
 namespace emergency_triage {
 

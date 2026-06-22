@@ -13,10 +13,10 @@ option(USE_SQLITE "Use SQLite for persistence" OFF)
 include(cmake/Dependencies.cmake)
 
 # Library
-add_subdirectory(src/backend)
+add_subdirectory(backend)
 
 # Executable
-add_subdirectory(src/app)
+add_subdirectory(app)
 
 if(BUILD_TESTS)
     enable_testing()

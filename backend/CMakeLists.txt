@@ -1,16 +1,16 @@
 add_library(hospital_backend STATIC
-    api/handlers.cpp
-    core/triage.cpp
-    storage/storage.cpp
-    storage/patient.cpp
-    utils/json_serialisation.cpp
+    src/api/handlers.cpp
+    src/core/triage.cpp
+    src/storage/storage.cpp
+    src/storage/patient.cpp
+    src/utils/json_serialisation.cpp
 )
 
 target_include_directories(hospital_backend 
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(hospital_backend
