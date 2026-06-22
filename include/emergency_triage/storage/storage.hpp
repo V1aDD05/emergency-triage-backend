@@ -7,6 +7,7 @@
 
 #include "emergency_triage/storage/data_structures.hpp"
 #include "emergency_triage/storage/patient.hpp"
+
 namespace emergency_triage {
 
 class PatientStorage {
@@ -22,4 +23,4 @@ private:
 	uint32_t nextId_ = 1;
 };
 
-}
+}  // namespace emergency_triage

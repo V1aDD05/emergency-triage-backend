@@ -8,84 +8,118 @@
 
 #include "emergency_triage/utils/errors.hpp"
 
-namespace emergency_triage {
-
 namespace {
 
-	bool deserialiseBoolField(const nlohmann::json& json, const std::string& key) {
-		bool defaultValue = false;
+bool deserialiseBoolField(const nlohmann::json& json, const std::string& key) {
+	bool defaultValue = false;
 
-		if (!json.contains(key)) {
-			throw ValidationError(key, "Missing required field");
-		}
-		const auto& value = json[key];
-		if (value.is_null()) {
-			throw ValidationError(key, "Must be either `true` or `false`");
-		}
-		if (!value.is_boolean()) {
-			throw ValidationError(key, "Must be a boolean");
-		}
-		return value.get<bool>();
+	if (!json.contains(key)) {
+		throw emergency_triage::ValidationError(key, "Missing required field");
+	}
+	const auto& value = json[key];
+	if (value.is_null()) {
+		throw emergency_triage::ValidationError(key, "Must be either `true` or `false`");
+	}
+	if (!value.is_boolean()) {
+		throw emergency_triage::ValidationError(key, "Must be a boolean");
+	}
+	return value.get<bool>();
+}
+
+template <typename T>
+
+T deserialiseUnsignedField(const nlohmann::json& json, const std::string& key) {
+	static_assert(std::is_unsigned<T>::value, "T must be an unsigned integer type");
+
+	if (!json.contains(key)) {
+		throw emergency_triage::ValidationError(key, "Missing required field");
 	}
 
-	template <typename T>
+	if (!json[key].is_number_unsigned()) {
+		throw emergency_triage::ValidationError(key, "Must be a non-negative integer");
+	}
 
-	T deserialiseUnsignedField(const nlohmann::json& json, const std::string& key) {
-		static_assert(std::is_unsigned<T>::value, "T must be an unsigned integer type");
+	uint64_t raw = json[key].get<uint64_t>();
+	if (raw > std::numeric_limits<T>::max()) {
+		throw emergency_triage::ValidationError(
+			key, std::format("Must be in range of (0..{})", std::numeric_limits<T>::max()));
+	}
 
-		if (!json.contains(key)) {
-			throw ValidationError(key, "Missing required field");
-		}
+	return static_cast<T>(raw);
+}
 
+std::optional<uint8_t> deserialiseAge(const nlohmann::json& json, const std::string& key) {
+	std::optional<uint8_t> result = std::nullopt;
+	if (json.contains(key) && !json[key].is_null()) {
 		if (!json[key].is_number_unsigned()) {
-			throw ValidationError(key, "Must be a non-negative integer");
+			throw emergency_triage::ValidationError(key, "Must be a non-negative integer");
 		}
 
-		uint64_t raw = json[key].get<uint64_t>();
-		if (raw > std::numeric_limits<T>::max()) {
-			throw ValidationError(key, std::format("Must be in range of (0..{})", std::numeric_limits<T>::max()));
+		uint64_t age_raw = json[key].get<uint64_t>();
+		if (age_raw > std::numeric_limits<uint8_t>::max()) {
+			throw emergency_triage::ValidationError(key, "Must be in range of <uint8_t> (0..255)");
 		}
 
-		return static_cast<T>(raw);
+		result = static_cast<uint8_t>(age_raw);
+	}
+	return result;
+}
+
+std::optional<emergency_triage::Gender> deserialiseGender(const nlohmann::json& json, const std::string& key) {
+	if (!json.contains(key) || json[key].is_null()) {
+		return std::nullopt;
 	}
 
-	std::optional<uint8_t> deserialiseAge(const nlohmann::json& json, const std::string& key) {
-		std::optional<uint8_t> result = std::nullopt;
-		if (json.contains(key) && !json[key].is_null()) {
-			if (!json[key].is_number_unsigned()) {
-				throw ValidationError(key, "Must be a non-negative integer");
-			}
-
-			uint64_t age_raw = json[key].get<uint64_t>();
-			if (age_raw > std::numeric_limits<uint8_t>::max()) {
-				throw ValidationError(key, "Must be in range of <uint8_t> (0..255)");
-			}
-
-			result = static_cast<uint8_t>(age_raw);
-		}
-		return result;
+	if (!json[key].is_string()) {
+		throw emergency_triage::ValidationError(key, "Must be a string");
 	}
 
-	std::optional<Gender> deserialiseGender(const nlohmann::json& json, const std::string& key) {
-		if (!json.contains(key) || json[key].is_null()) {
-			return std::nullopt;
-		}
-
-		if (!json[key].is_string()) {
-			throw ValidationError(key, "Must be a string");
-		}
-
-		std::string str = json[key];
-		if (str == "male") {
-			return Gender::Male;
-		}
-		if (str == "female") {
-			return Gender::Female;
-		}
-
-		throw ValidationError(key, "Invalid gender value: " + str);
+	std::string str = json[key];
+	if (str == "male") {
+		return emergency_triage::Gender::Male;
 	}
+	if (str == "female") {
+		return emergency_triage::Gender::Female;
+	}
+
+	throw emergency_triage::ValidationError(key, "Invalid gender value: " + str);
+}
+
+nlohmann::json serialiseEmergencyData(const emergency_triage::EmergencyData& emeregencyData) {
+	nlohmann::json json;
+	json["is_bleeding"] = emeregencyData.is_bleeding;
+	json["is_extensive_wounds"] = emeregencyData.is_extensive_wounds;
+	json["is_penetrating_wounds"] = emeregencyData.is_penetrating_wounds;
+	json["is_consciousness_depression"] = emeregencyData.is_consciousness_depression;
+	json["is_respiratory_depression"] = emeregencyData.is_respiratory_depression;
+	json["is_hemodynamic_depression"] = emeregencyData.is_hemodynamic_depression;
+	json["is_severe_combined_injury"] = emeregencyData.is_severe_combined_injury;
+	return json;
+}
+
+nlohmann::json serialiseTriageData(const emergency_triage::TriageData& triageData) {
+	nlohmann::json json;
+	json["eye_response"] = triageData.eye_response;
+	json["verbal_response"] = triageData.verbal_response;
+	json["motor_response"] = triageData.motor_response;
+	json["respiratory_rate"] = triageData.respiratory_rate;
+	json["systolic_bp"] = triageData.systolic_bp;
+	return json;
+}
+
+nlohmann::json serialiseDemographicData(const emergency_triage::DemographicData& demographicData) {
+	nlohmann::json json;
+	if (demographicData.age.has_value()) {
+		json["age"] = *demographicData.age;
+	}
+	if (demographicData.sex.has_value()) {
+		json["sex"] = (*demographicData.sex == emergency_triage::Gender::Male) ? "male" : "female";
+	}
+	return json;
+}
 }  // namespace
+
+namespace emergency_triage {
 
 EmergencyData deserialiseEmergencyData(const nlohmann::json& json) {
 	EmergencyData result;
@@ -135,42 +169,6 @@ uint32_t deserialiseID(const httplib::Request& req) {
 	return static_cast<uint32_t>(id_raw);
 }
 
-namespace {
-
-	nlohmann::json serialiseEmergencyData(const EmergencyData& emeregencyData) {
-		nlohmann::json json;
-		json["is_bleeding"] = emeregencyData.is_bleeding;
-		json["is_extensive_wounds"] = emeregencyData.is_extensive_wounds;
-		json["is_penetrating_wounds"] = emeregencyData.is_penetrating_wounds;
-		json["is_consciousness_depression"] = emeregencyData.is_consciousness_depression;
-		json["is_respiratory_depression"] = emeregencyData.is_respiratory_depression;
-		json["is_hemodynamic_depression"] = emeregencyData.is_hemodynamic_depression;
-		json["is_severe_combined_injury"] = emeregencyData.is_severe_combined_injury;
-		return json;
-	}
-
-	nlohmann::json serialiseTriageData(const TriageData& triageData) {
-		nlohmann::json json;
-		json["eye_response"] = triageData.eye_response;
-		json["verbal_response"] = triageData.verbal_response;
-		json["motor_response"] = triageData.motor_response;
-		json["respiratory_rate"] = triageData.respiratory_rate;
-		json["systolic_bp"] = triageData.systolic_bp;
-		return json;
-	}
-
-	nlohmann::json serialiseDemographicData(const DemographicData& demographicData) {
-		nlohmann::json json;
-		if (demographicData.age.has_value()) {
-			json["age"] = *demographicData.age;
-		}
-		if (demographicData.sex.has_value()) {
-			json["sex"] = (*demographicData.sex == Gender::Male) ? "male" : "female";
-		}
-		return json;
-	}
-}  // namespace
-
 nlohmann::json serialiseJSON(const Patient& patient) {
 	nlohmann::json json;
 	json["id"] = patient.getId();
@@ -210,4 +208,4 @@ nlohmann::json serialiseJSON(const std::optional<Patient>& patient) {
 	return serialiseJSON(*patient);
 }
 
-}
+}  // namespace emergency_triage
