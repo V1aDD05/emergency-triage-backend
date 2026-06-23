@@ -17,10 +17,7 @@ bool deserialiseBoolField(const nlohmann::json& json, const std::string& key) {
 	if (!json.contains(key)) {
 		throw emergency_triage::ValidationError(key, "Missing required field");
 	}
-	const auto& value = json[key];
-	if (value.is_null()) {
-		throw emergency_triage::ValidationError(key, "Must be either `true` or `false`");
-	}
+	auto value = json[key];
 	if (!value.is_boolean()) {
 		throw emergency_triage::ValidationError(key, "Must be a boolean");
 	}
@@ -49,21 +46,13 @@ T deserialiseUnsignedField(const nlohmann::json& json, const std::string& key) {
 	return static_cast<T>(raw);
 }
 
-std::optional<uint8_t> deserialiseAge(const nlohmann::json& json, const std::string& key) {
-	std::optional<uint8_t> result = std::nullopt;
-	if (json.contains(key) && !json[key].is_null()) {
-		if (!json[key].is_number_unsigned()) {
-			throw emergency_triage::ValidationError(key, "Must be a non-negative integer");
-		}
+template <typename T>
 
-		uint64_t age_raw = json[key].get<uint64_t>();
-		if (age_raw > std::numeric_limits<uint8_t>::max()) {
-			throw emergency_triage::ValidationError(key, "Must be in range of <uint8_t> (0..255)");
-		}
-
-		result = static_cast<uint8_t>(age_raw);
+std::optional<T> deserialiseOptionalUnsigned(const nlohmann::json& json, const std::string& key) {
+	if (!json.contains(key) || json[key].is_null()) {
+		return std::nullopt;
 	}
-	return result;
+	return deserialiseUnsignedField<T>(json, key);
 }
 
 std::optional<emergency_triage::Gender> deserialiseGender(const nlohmann::json& json, const std::string& key) {
@@ -144,14 +133,22 @@ TriageData deserialiseTriageData(const nlohmann::json& json) {
 }
 
 DemographicData deserialiseDemographicData(const nlohmann::json& json) {
-	DemographicData result(deserialiseAge(json, "age"), deserialiseGender(json, "sex"));
+	DemographicData result(deserialiseOptionalUnsigned<uint8_t>(json, "age"), deserialiseGender(json, "sex"));
 	return result;
 }
 
 uint32_t deserialiseID(const httplib::Request& req) {
+	size_t idGroupIndex = 1;
+	if (req.matches.size() < idGroupIndex) {
+		throw ValidationError("id", "Missing id in path");
+	}
 	std::string id_str = req.matches[1];
 
-	if (id_str.empty() || id_str[0] == '-') {
+	if (id_str.empty()) {
+		throw ValidationError("id", "Must be not empty");
+	}
+
+	if (!std::isdigit(static_cast<unsigned char>(id_str[0]))) {
 		throw ValidationError("id", "Must be a non-negative integer");
 	}
 
