@@ -21,7 +21,7 @@ public:
 
 private:
 	std::unordered_map<uint32_t, Patient> patientsStorage_;
-	uint32_t nextId_ = 1;
+	uint32_t nextId_ = 0;
 };
 
 }  // namespace emergency_triage
