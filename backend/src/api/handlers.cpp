@@ -56,7 +56,9 @@ void handlePostPatients(const httplib::Request& req, httplib::Response& res, Pat
 										   .triage_data = deserialiseTriageData(json["triage_data"]),
 										   .demographic_data = deserialiseDemographicData(json["demographic_data"])};
 
-	uint32_t id = storage.addPatient(patientClientData, requestReceiptTime, status);
+	uint8_t priority = computePriority(patientClientData.emergency_data, patientClientData.triage_data);
+
+	uint32_t id = storage.addPatient(requestReceiptTime, patientClientData, priority, status);
 
 	// TODO: remove stub for `estimated_wait_time` at the
 	// stage 3

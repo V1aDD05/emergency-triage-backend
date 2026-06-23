@@ -100,21 +100,21 @@ nlohmann::json serialiseEmergencyData(const emergency_triage::EmergencyData& eme
 
 nlohmann::json serialiseTriageData(const emergency_triage::TriageData& triageData) {
 	nlohmann::json json;
-	json["eye_response"] = triageData.eye_response;
-	json["verbal_response"] = triageData.verbal_response;
-	json["motor_response"] = triageData.motor_response;
-	json["respiratory_rate"] = triageData.respiratory_rate;
-	json["systolic_bp"] = triageData.systolic_bp;
+	json["eye_response"] = triageData.getEyeResponse();
+	json["verbal_response"] = triageData.getVerbalResponse();
+	json["motor_response"] = triageData.getMotorResponse();
+	json["respiratory_rate"] = triageData.getRespiratoryRate();
+	json["systolic_bp"] = triageData.getSystolicBP();
 	return json;
 }
 
 nlohmann::json serialiseDemographicData(const emergency_triage::DemographicData& demographicData) {
 	nlohmann::json json;
-	if (demographicData.age.has_value()) {
-		json["age"] = *demographicData.age;
+	if (demographicData.getAge().has_value()) {
+		json["age"] = demographicData.getAge();
 	}
-	if (demographicData.sex.has_value()) {
-		json["sex"] = (*demographicData.sex == emergency_triage::Gender::Male) ? "male" : "female";
+	if (demographicData.getSex().has_value()) {
+		json["sex"] = (demographicData.getSex() == emergency_triage::Gender::Male) ? "male" : "female";
 	}
 	return json;
 }
@@ -135,19 +135,16 @@ EmergencyData deserialiseEmergencyData(const nlohmann::json& json) {
 }
 
 TriageData deserialiseTriageData(const nlohmann::json& json) {
-	TriageData result;
-	result.eye_response = deserialiseUnsignedField<uint8_t>(json, "eye_response");
-	result.motor_response = deserialiseUnsignedField<uint8_t>(json, "motor_response");
-	result.verbal_response = deserialiseUnsignedField<uint8_t>(json, "verbal_response");
-	result.respiratory_rate = deserialiseUnsignedField<uint8_t>(json, "respiratory_rate");
-	result.systolic_bp = deserialiseUnsignedField<uint16_t>(json, "systolic_bp");
+	TriageData result(deserialiseUnsignedField<uint8_t>(json, "eye_response"),
+					  deserialiseUnsignedField<uint8_t>(json, "verbal_response"),
+					  deserialiseUnsignedField<uint8_t>(json, "motor_response"),
+					  deserialiseUnsignedField<uint8_t>(json, "respiratory_rate"),
+					  deserialiseUnsignedField<uint16_t>(json, "systolic_bp"));
 	return result;
 }
 
 DemographicData deserialiseDemographicData(const nlohmann::json& json) {
-	DemographicData result;
-	result.age = deserialiseAge(json, "age");
-	result.sex = deserialiseGender(json, "sex");
+	DemographicData result(deserialiseAge(json, "age"), deserialiseGender(json, "sex"));
 	return result;
 }
 

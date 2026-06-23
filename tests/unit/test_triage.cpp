@@ -11,13 +11,13 @@ TEST(TriageTest, Dummy) {
 													   .is_respiratory_depression = false,
 													   .is_hemodynamic_depression = false,
 													   .is_severe_combined_injury = false};
-	emergency_triage::TriageData triageData = {
-		.eye_response = 2,
-		.verbal_response = 2,
-		.motor_response = 2,
-		.respiratory_rate = 25,
-		.systolic_bp = 120,
-	};
+	uint8_t eye_response = 2;
+	uint8_t verbal_response = 2;
+	uint8_t motor_response = 2;
+	uint8_t respiratory_rate = 25;
+	uint16_t systolic_bp = 120;
+	emergency_triage::TriageData triageData(
+		eye_response, verbal_response, motor_response, respiratory_rate, systolic_bp);
 
 	// Stub, should be developed later
     EXPECT_EQ(computePriority(emergencyData, triageData), 1);

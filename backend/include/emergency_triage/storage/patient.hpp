@@ -9,8 +9,8 @@ namespace emergency_triage {
 
 class Patient {
 public:
-	Patient(uint32_t id, std::chrono::system_clock::time_point timestamp, PatientStatus status,
-			const PatientClientData& patient_client_data);
+	Patient(std::chrono::system_clock::time_point request_receipt_time, uint32_t id,
+			const PatientClientData& patient_client_data, uint8_t priority, PatientStatus status);
 
 	// getters
 	std::chrono::system_clock::time_point getRequestReceiptTime() const {

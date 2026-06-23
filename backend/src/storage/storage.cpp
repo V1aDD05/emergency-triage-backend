@@ -4,9 +4,10 @@
 
 namespace emergency_triage {
 
-uint32_t PatientStorage::addPatient(const PatientClientData& patientClientData,
-									std::chrono::system_clock::time_point requestReceiptTime, PatientStatus status) {
-	Patient patient(nextId_, requestReceiptTime, status, patientClientData);
+uint32_t PatientStorage::addPatient(std::chrono::system_clock::time_point requestReceiptTime,
+									const PatientClientData& patientClientData, uint8_t priority,
+									PatientStatus status) {
+	Patient patient(requestReceiptTime, nextId_, patientClientData, priority, status);
 	patientsStorage_.insert({patient.getId(), patient});
 	++nextId_;
 	return patient.getId();
