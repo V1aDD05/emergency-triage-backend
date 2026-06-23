@@ -11,9 +11,9 @@ Patient::Patient(std::chrono::system_clock::time_point request_receipt_time, uin
 				 const PatientClientData& patient_client_data, uint8_t priority, PatientStatus status)
 	: request_receipt_time_(request_receipt_time),
 	  id_(id),
-	  emergency_data_(patient_client_data.emergency_data),
-	  triage_data_(patient_client_data.triage_data),
-	  demographic_data_(patient_client_data.demographic_data) {
+	  emergency_data_(std::move(patient_client_data.emergency_data)),
+	  triage_data_(std::move(patient_client_data.triage_data)),
+	  demographic_data_(std::move(patient_client_data.demographic_data)) {
 	setPriority(priority);
 	setStatus(status);
 }
@@ -33,16 +33,16 @@ void Patient::setStatus(PatientStatus status) {
 	}
 }
 
-void Patient::setEmergencyData(const EmergencyData& emergency_data) {
-	emergency_data_ = emergency_data;
+void Patient::setEmergencyData(EmergencyData emergency_data) {
+	emergency_data_ = std::move(emergency_data);
 }
 
-void Patient::setTriageData(const TriageData& triage_data) {
-	triage_data_ = triage_data;
+void Patient::setTriageData(TriageData triage_data) {
+	triage_data_ = std::move(triage_data);
 }
 
-void Patient::setDemographicData(const DemographicData& demographic_data) {
-	demographic_data_ = demographic_data;
+void Patient::setDemographicData(DemographicData demographic_data) {
+	demographic_data_ = std::move(demographic_data);
 }
 
 void Patient::setPriority(uint8_t priority) {

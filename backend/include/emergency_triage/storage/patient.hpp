@@ -44,9 +44,9 @@ public:
 	// setters
 	void setPriority(uint8_t priority);
 	void setStatus(PatientStatus status);
-	void setEmergencyData(const EmergencyData& emergency_data);
-	void setTriageData(const TriageData& triage_data);
-	void setDemographicData(const DemographicData& demographic_data);
+	void setEmergencyData(EmergencyData emergency_data);
+	void setTriageData(TriageData triage_data);
+	void setDemographicData(DemographicData demographic_data);
 
 private:
 	std::chrono::system_clock::time_point request_receipt_time_;
