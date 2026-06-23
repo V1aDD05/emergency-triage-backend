@@ -46,7 +46,7 @@ void commonExceptionHandler(const httplib::Request& req, httplib::Response& res,
 	}
 }
 
-void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientStorage& storage) {
+void handlePostPatients(const httplib::Request& req, httplib::Response& res, IPatientStorage& storage) {
 	auto requestReceiptTime = std::chrono::system_clock::now();
 	PatientStatus status = PatientStatus::OnTheWay;
 
@@ -68,7 +68,7 @@ void handlePostPatients(const httplib::Request& req, httplib::Response& res, Pat
 	res.status = 201;
 }
 
-void handleGetPatientById(const httplib::Request& req, httplib::Response& res, const PatientStorage& storage) {
+void handleGetPatientById(const httplib::Request& req, httplib::Response& res, const IPatientStorage& storage) {
 	uint32_t id = deserialiseID(req);
 
 	const auto patient = storage.getPatient(id);
@@ -84,7 +84,7 @@ void handleGetPatientById(const httplib::Request& req, httplib::Response& res, c
 	res.status = 200;
 }
 
-void handleGetPatients(const httplib::Request& req, httplib::Response& res, const PatientStorage& storage) {
+void handleGetPatients(const httplib::Request& req, httplib::Response& res, const IPatientStorage& storage) {
 	const std::vector<Patient> patients = storage.getAllPatients();
 
 	nlohmann::json array = nlohmann::json::array();
@@ -96,7 +96,7 @@ void handleGetPatients(const httplib::Request& req, httplib::Response& res, cons
 	res.status = 200;
 }
 
-void setupHandlers(httplib::Server& server, PatientStorage& storage) {
+void setupHandlers(httplib::Server& server, IPatientStorage& storage) {
 	server.set_exception_handler(commonExceptionHandler);
 	server.Post("/patients", [&storage](const httplib::Request& req, httplib::Response& res) {
 		handlePostPatients(req, res, storage);

@@ -10,14 +10,22 @@
 
 namespace emergency_triage {
 
-class PatientStorage {
+class IPatientStorage {
+public:
+	virtual ~IPatientStorage() = default;
+	virtual uint32_t addPatient(std::chrono::system_clock::time_point requestReceiptTime,
+								const PatientClientData& patientClientData, uint8_t priority, PatientStatus status) = 0;
+	virtual std::optional<Patient> getPatient(uint32_t id) const = 0;
+	virtual std::vector<Patient> getAllPatients() const = 0;
+};
+class PatientStorage : public IPatientStorage {
 public:
 	uint32_t addPatient(std::chrono::system_clock::time_point requestReceiptTime,
-						const PatientClientData& patientClientData, uint8_t priority, PatientStatus status);
+						const PatientClientData& patientClientData, uint8_t priority, PatientStatus status) override;
 
-	std::optional<Patient> getPatient(uint32_t id) const;
+	std::optional<Patient> getPatient(uint32_t id) const override;
 
-	std::vector<Patient> getAllPatients() const;
+	std::vector<Patient> getAllPatients() const override;
 
 private:
 	std::unordered_map<uint32_t, Patient> patientsStorage_;
