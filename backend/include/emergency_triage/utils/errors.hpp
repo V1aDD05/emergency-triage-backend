@@ -9,6 +9,7 @@ namespace emergency_triage {
 class Exception : public std::runtime_error {
 public:
 	explicit Exception(const std::string& message) : std::runtime_error(message) {}
+	virtual ~Exception() = default;
 	virtual int httpStatus() const = 0;
 	virtual bool isShowToClient() const = 0;
 };
