@@ -13,7 +13,7 @@ public:
 			const PatientClientData& patient_client_data);
 
 	// getters
-	std::chrono::system_clock::time_point getRequestReceiptTime() const noexcept {
+	std::chrono::system_clock::time_point getRequestReceiptTime() const {
 		return request_receipt_time_;
 	}
 
@@ -29,11 +29,11 @@ public:
 		return status_;
 	}
 
-	const EmergencyData& getEmergencyData() const noexcept {
+	EmergencyData getEmergencyData() const noexcept {
 		return emergency_data_;
 	}
 
-	const TriageData& getTriageData() const noexcept {
+	TriageData getTriageData() const noexcept {
 		return triage_data_;
 	}
 

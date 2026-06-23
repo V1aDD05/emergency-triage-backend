@@ -19,6 +19,8 @@ Patient::Patient(uint32_t id, std::chrono::system_clock::time_point request_rece
 
 // setters
 void Patient::setStatus(PatientStatus status) {
+	// TODO: if patient is died, excude him from queue
+	// TODO: add second parameter to understand if changes only this field or other fields too
 	switch (status) {
 		case PatientStatus::OnTheWay:
 		case PatientStatus::Waiting:
@@ -33,10 +35,14 @@ void Patient::setStatus(PatientStatus status) {
 }
 
 void Patient::setEmergencyData(const EmergencyData& emergency_data) {
+	// TODO: if emergency_data changes, we need to call business logic to recalculate priority
+	// TODO: add second parameter to understand if changes only this field or other fields too
 	emergency_data_ = emergency_data;
 }
 
 void Patient::setTriageData(const TriageData& triage_data) {
+	// TODO: if triage_data changes, we need to call business logic to recalculate priority
+	// TODO: add second parameter to understand if changes only this field or other fields too
 	if (triage_data.eye_response < 1 || triage_data.eye_response > 4) {
 		throw ValidationError("eye_response", "Must be in range [1..4]");
 	}
@@ -57,6 +63,8 @@ void Patient::setTriageData(const TriageData& triage_data) {
 }
 
 void Patient::setDemographicData(const DemographicData& demographic_data) {
+	// TODO: if demographic_data changes, we need to call business logic to recalculate priority
+	// TODO: add second parameter to understand if changes only this field or other fields too
 	if (demographic_data.age.has_value() && *demographic_data.age > 130) {
 		throw ValidationError("age", "Must be in range [0..130]");
 	}
