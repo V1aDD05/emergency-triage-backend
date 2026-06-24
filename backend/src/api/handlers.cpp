@@ -1,13 +1,14 @@
 #include "emergency_triage/api/handlers.hpp"
 
+#include <chrono>
 #include <optional>
 #include <string>
-#include <chrono>
 
 #include <nlohmann/json.hpp>
 
 #include "core/triage.hpp"
 #include "emergency_triage/storage/data_structures.hpp"
+#include "emergency_triage/storage/patient.hpp"
 #include "emergency_triage/utils/errors.hpp"
 #include "spdlog/spdlog.h"
 #include "utils/error_utils.hpp"
@@ -46,9 +47,8 @@ void commonExceptionHandler(const httplib::Request& req, httplib::Response& res,
 	}
 }
 
-void handlePostPatients(const httplib::Request& req, httplib::Response& res, IPatientStorage& storage) {
+void handlePostPatients(const httplib::Request& req, httplib::Response& res, PatientService& patientService) {
 	auto requestReceiptTime = std::chrono::system_clock::now();
-	PatientStatus status = PatientStatus::OnTheWay;
 
 	auto json = catchValidationErrors([&]() { return nlohmann::json::parse(req.body); }, "body");
 
@@ -56,9 +56,7 @@ void handlePostPatients(const httplib::Request& req, httplib::Response& res, IPa
 										   .triage_data = deserialiseTriageData(json["triage_data"]),
 										   .demographic_data = deserialiseDemographicData(json["demographic_data"])};
 
-	uint8_t priority = computePriority(patientClientData.emergency_data, patientClientData.triage_data);
-
-	uint32_t id = storage.addPatient(requestReceiptTime, patientClientData, priority, status);
+	uint32_t id = patientService.addPatient(requestReceiptTime, patientClientData);
 
 	// TODO: remove stub for `estimated_wait_time` at the
 	// stage 3
@@ -68,10 +66,10 @@ void handlePostPatients(const httplib::Request& req, httplib::Response& res, IPa
 	res.status = 201;
 }
 
-void handleGetPatientById(const httplib::Request& req, httplib::Response& res, const IPatientStorage& storage) {
+void handleGetPatientById(const httplib::Request& req, httplib::Response& res, PatientService& patientService) {
 	uint32_t id = deserialiseID(req);
 
-	const auto patient = storage.getPatient(id);
+	const auto patient = patientService.getPatientById(id);
 	if (!patient) {
 		res.status = 404;
 		res.set_content("{\"error\":\"Patient not found\"}", "application/json");
@@ -84,8 +82,8 @@ void handleGetPatientById(const httplib::Request& req, httplib::Response& res, c
 	res.status = 200;
 }
 
-void handleGetPatients(const httplib::Request& req, httplib::Response& res, const IPatientStorage& storage) {
-	const std::vector<Patient> patients = storage.getAllPatients();
+void handleGetPatients(const httplib::Request& req, httplib::Response& res, PatientService& patientService) {
+	const std::vector<Patient> patients = patientService.getPatients();
 
 	nlohmann::json array = nlohmann::json::array();
 	for (const auto& patient : patients) {
@@ -96,17 +94,16 @@ void handleGetPatients(const httplib::Request& req, httplib::Response& res, cons
 	res.status = 200;
 }
 
-void setupHandlers(httplib::Server& server, IPatientStorage& storage) {
+void setupHandlers(httplib::Server& server, PatientService& patientService) {
 	server.set_exception_handler(commonExceptionHandler);
-	server.Post("/patients", [&storage](const httplib::Request& req, httplib::Response& res) {
-		handlePostPatients(req, res, storage);
+	server.Post("/patients", [&patientService](const httplib::Request& req, httplib::Response& res) {
+		handlePostPatients(req, res, patientService);
 	});
-	server.Get(R"(/patients/([^/]+))", [&storage](const httplib::Request& req, httplib::Response& res) {
-		handleGetPatientById(req, res, storage);
+	server.Get(R"(/patients/([^/]+))", [&patientService](const httplib::Request& req, httplib::Response& res) {
+		handleGetPatientById(req, res, patientService);
 	});
-	server.Get("/patients", [&storage](const httplib::Request& req, httplib::Response& res) {
-		handleGetPatients(req, res, storage);
+	server.Get("/patients", [&patientService](const httplib::Request& req, httplib::Response& res) {
+		handleGetPatients(req, res, patientService);
 	});
 }
-
 }

@@ -1,9 +1,10 @@
 add_library(hospital_backend STATIC
     src/api/handlers.cpp
-    src/core/triage.cpp
     src/storage/storage.cpp
     src/storage/patient.cpp
     src/utils/json_serialisation.cpp
+    src/core/priority_calculator_factory.cpp
+    src/services/patient_service.cpp
 )
 
 target_include_directories(hospital_backend 
