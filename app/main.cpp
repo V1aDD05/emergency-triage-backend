@@ -4,8 +4,8 @@
 
 #include <httplib.h>
 
+#include "emergency_triage/api/router.hpp"
 #include "emergency_triage/core/i_priority_calculator.hpp"
-#include "emergency_triage/api/handlers.hpp"
 #include "emergency_triage/services/patient_service.hpp"
 #include "emergency_triage/storage/storage.hpp"
 #include "spdlog/spdlog.h"
@@ -20,7 +20,8 @@ int main() {
 	emergency_triage::PatientStorage storage;
 	emergency_triage::PatientService patientService(storage, *calculator);
 	httplib::Server server;
-	setupHandlers(server, patientService);
+	emergency_triage::Router router(patientService);
+	router.setup(server);
 	spdlog::info("Server started on {}:{}", host, port);
 	server.listen(host, port);
 	return 0;

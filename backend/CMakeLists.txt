@@ -1,5 +1,5 @@
 add_library(hospital_backend STATIC
-    src/api/handlers.cpp
+    src/api/router.cpp
     src/storage/storage.cpp
     src/storage/patient.cpp
     src/utils/json_serialisation.cpp
