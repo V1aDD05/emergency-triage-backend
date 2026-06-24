@@ -42,11 +42,7 @@ public:
 	}
 
 	// setters
-	void setPriority(uint8_t priority);
 	void setStatus(PatientStatus status);
-	void setEmergencyData(EmergencyData emergency_data);
-	void setTriageData(TriageData triage_data);
-	void setDemographicData(DemographicData demographic_data);
 
 private:
 	void validateStatus(PatientStatus status);

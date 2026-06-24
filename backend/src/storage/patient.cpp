@@ -50,20 +50,4 @@ void Patient::setStatus(PatientStatus status) {
 	status_ = status;
 }
 
-void Patient::setPriority(uint8_t priority) {
-	validatePriority(priority);
-	priority_ = priority;
-}
-
-void Patient::setEmergencyData(EmergencyData emergency_data) {
-	emergency_data_ = std::move(emergency_data);
-}
-
-void Patient::setTriageData(TriageData triage_data) {
-	triage_data_ = std::move(triage_data);
-}
-
-void Patient::setDemographicData(DemographicData demographic_data) {
-	demographic_data_ = std::move(demographic_data);
-}
 }

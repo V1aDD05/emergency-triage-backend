@@ -55,31 +55,6 @@ public:
 		return systolic_bp_;
 	}
 
-	void setEyeResponse(uint8_t eye_response) {
-		validateEyeResponse(eye_response);
-		eye_response_ = eye_response;
-	}
-
-	void setVerbalResponse(uint8_t verbal_response) {
-		validateVerbalResponse(verbal_response);
-		verbal_response_ = verbal_response;
-	}
-
-	void setMotorResponse(uint8_t motor_response) {
-		validateMotorResponse(motor_response);
-		motor_response_ = motor_response;
-	}
-
-	void setRespiratoryRate(uint8_t respiratory_rate) {
-		validateRespiratoryRate(respiratory_rate);
-		respiratory_rate_ = respiratory_rate;
-	}
-
-	void setSystolicBP(uint16_t systolic_bp) {
-		validateSystolicBP(systolic_bp);
-		systolic_bp_ = systolic_bp;
-	}
-
 private:
 	void validateEyeResponse(uint8_t eye_response) const {
 		if (eye_response < 1 || eye_response > 4) {
