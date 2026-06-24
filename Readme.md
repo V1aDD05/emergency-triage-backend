@@ -18,6 +18,7 @@ Backend-сервис для распределения пострадавших 
 - [Версионирование](#версионирование)
 - [Ветки](#ветки)
 - [Стиль коммитов](#стиль-коммитов)
+- [Сборка](#сборка)
 - [Документация](#документация)
 - [Благодарности](#благодарности)
 - [Об авторе](#об-авторе)
@@ -149,11 +150,13 @@ flowchart TD
 **Пример использования**
 
 ```cpp
-#include "emergency_triage/storage/storage.hpp"
+#include "emergency_triage/storage/data_structures.hpp"
 
-emergency_triage::PatientStorage storage;
-AmbulanceData data = ...;
-uint32_t id = storage.addPatient(data);
+uint8_t age = 10;
+emergency_triage::DemographicData demographicData(age);
+uint8_t newAge = 12;
+demographicData.setAge(newAge);
+
 ```
 
 ## Версионирование
@@ -191,6 +194,38 @@ uint32_t id = storage.addPatient(data);
 | **style** | Стиль кода | Изменения, не влияющие на смысл кода (форматирование, пробелы, и т.д.) |
 | **revert** | Откат изменений | Отмена одного из предыдущих коммитов |
 
+## Сборка
+Проект разрабатывался и тестировался на **Ubuntu 22.04**. Для других операционных систем проверок не производилось, но сборка, скорее всего, возможна при установке аналогичных зависимостей.
+
+### Установка зависимостей в Ubuntu/Debian
+#### Обязательные (требуются для сборки)
+- build-essential;
+- cmake (≥ v. 3.15);
+- git;
+- libsqlite3-dev;
+
+Для установки выполните команды, указанные ниже.
+
+```bash
+sudo apt update
+sudo apt install -y build-essential cmake git libsqlite3-dev
+```
+
+#### Дополнительные инструменты (для разработчиков)
+- clang-format (≥ v. 15.0) - для форматирования кода;
+- jq - для обработки JSON в скриптах;
+- curl - для HTTP-запросов (например, в smoke-тестах).
+
+```bash
+sudo apt install -y clang-format jq curl
+```
+
+### Запуск сборки
+Запустите скрипт, выполняющий конфигурацию CMake, сборку проекта и запуск тестов.
+
+```bash
+./build.sh
+```
 
 ## Документация
 - [Модели данных](docs/data_models.md);

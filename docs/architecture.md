@@ -25,7 +25,7 @@ flowchart TD
     end
 
     subgraph "Структуры данных"
-        F["src/storage/data_structures.hpp\nDTO структуры данных"]
+        F["src/storage/data_structures.hpp\nДругие классы и DTO структуры данных"]
         G["src/storage/patient.hpp/.cpp\nКласс `Patient`"]
     end
 
@@ -56,7 +56,7 @@ flowchart TD
 
 
 ## Хранилище
-На данном этапе реализовано в виде класса `PatientStorage`, подробнее [см.здесь](src/storage/storage.hpp).
+Базовый класс - `IPatientStorage`. От него на данном этапе наследуется класс in-memory хранилища `PatientStorage`, подробнее [см.здесь](src/storage/storage.hpp).
 
 ### Поля класса (приватные)
 - `nextId_` - поле, хранящее ID, который будет присвоен следующему "пациенту" ( [подробнее о структуре `Patient`](docs/data_models.md));
