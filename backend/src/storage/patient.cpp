@@ -13,24 +13,46 @@ Patient::Patient(std::chrono::system_clock::time_point request_receipt_time, uin
 	  id_(id),
 	  emergency_data_(std::move(patient_client_data.emergency_data)),
 	  triage_data_(std::move(patient_client_data.triage_data)),
-	  demographic_data_(std::move(patient_client_data.demographic_data)) {
-	setPriority(priority);
-	setStatus(status);
+	  demographic_data_(std::move(patient_client_data.demographic_data)),
+	  priority_(priority),
+	  status_(status) {
+	validateAll();
 }
 
-// setters
-void Patient::setStatus(PatientStatus status) {
+// validation
+void Patient::validateStatus(PatientStatus status) {
 	switch (status) {
 		case PatientStatus::OnTheWay:
 		case PatientStatus::Waiting:
 		case PatientStatus::InSurgery:
 		case PatientStatus::IntensiveCare:
 		case PatientStatus::Died:
-			status_ = status;
-			break;
+			return;
 		default:
 			throw ValidationError("status", "Invalid patient status");
 	}
+}
+
+void Patient::validatePriority(uint8_t priority) {
+	if (priority < 1 || priority > 4) {
+		throw ValidationError("priority", "Must be in range [1..4]");
+	}
+}
+
+void Patient::validateAll() {
+	validateStatus(status_);
+	validatePriority(priority_);
+}
+
+// setters
+void Patient::setStatus(PatientStatus status) {
+	validateStatus(status);
+	status_ = status;
+}
+
+void Patient::setPriority(uint8_t priority) {
+	validatePriority(priority);
+	priority_ = priority;
 }
 
 void Patient::setEmergencyData(EmergencyData emergency_data) {
@@ -44,12 +66,4 @@ void Patient::setTriageData(TriageData triage_data) {
 void Patient::setDemographicData(DemographicData demographic_data) {
 	demographic_data_ = std::move(demographic_data);
 }
-
-void Patient::setPriority(uint8_t priority) {
-	if (priority < 1 || priority > 4) {
-		throw ValidationError("priority", "Must be in range [1..4]");
-	}
-	priority_ = priority;
-}
-
 }

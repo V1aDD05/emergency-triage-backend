@@ -49,6 +49,10 @@ public:
 	void setDemographicData(DemographicData demographic_data);
 
 private:
+	void validateStatus(PatientStatus status);
+	void validatePriority(uint8_t priority);
+	void validateAll();
+
 	std::chrono::system_clock::time_point request_receipt_time_;
 	uint32_t id_;
 
