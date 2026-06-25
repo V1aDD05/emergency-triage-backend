@@ -14,5 +14,5 @@ public:
 	virtual uint8_t computePriority(const EmergencyData& emergencyData, const TriageData& triageData) const = 0;
 };
 
-std::unique_ptr<IPriorityCalculator> createPriorityCalculator(const std::string& triageMethod);
+std::shared_ptr<IPriorityCalculator> createPriorityCalculator(const std::string& triageMethod);
 }

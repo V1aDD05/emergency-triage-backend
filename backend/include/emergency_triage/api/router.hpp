@@ -1,6 +1,7 @@
 #pragma once
 
 #include <exception>
+#include <memory>
 
 #include <httplib.h>
 
@@ -10,7 +11,7 @@ namespace emergency_triage {
 
 class Router {
 public:
-	explicit Router(PatientService &patientService);
+	explicit Router(std::shared_ptr<PatientService> patientService);
 
 	void setup(httplib::Server &server);
 
@@ -23,7 +24,7 @@ private:
 
 	void handleGetPatients(const httplib::Request &req, httplib::Response &res);
 
-	PatientService &patientService_;
+	std::shared_ptr<PatientService> patientService_;
 }; 
 
 }

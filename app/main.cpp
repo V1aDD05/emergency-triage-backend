@@ -14,11 +14,11 @@ int main() {
 	const char* host = std::getenv("SERVER_HOST") ? std::getenv("SERVER_HOST") : "127.0.0.1";
 	int port = std::getenv("SERVER_PORT") ? std::stoi(std::getenv("SERVER_PORT")) : 8080;
 	std::string triageMethod = std::getenv("TRIAGE_METHOD") ? std::getenv("TRIAGE_METHOD") : "SORT";
-	std::unique_ptr<emergency_triage::IPriorityCalculator> calculator =
+	std::shared_ptr<emergency_triage::IPriorityCalculator> calculator =
 		emergency_triage::createPriorityCalculator(triageMethod);
 
-	emergency_triage::PatientStorage storage;
-	emergency_triage::PatientService patientService(storage, *calculator);
+	auto storage = std::make_shared<emergency_triage::PatientStorage>();
+	auto patientService = std::make_shared<emergency_triage::PatientService>(storage, calculator);
 	httplib::Server server;
 	emergency_triage::Router router(patientService);
 	router.setup(server);

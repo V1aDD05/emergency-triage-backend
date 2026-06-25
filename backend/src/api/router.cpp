@@ -16,7 +16,7 @@
 
 namespace emergency_triage {
 
-Router::Router(PatientService& patientService) : patientService_(patientService) {
+Router::Router(std::shared_ptr<PatientService> patientService) : patientService_(patientService) {
 }
 
 void Router::commonExceptionHandler(const httplib::Request& req, httplib::Response& res, std::exception_ptr ep) {
@@ -59,7 +59,7 @@ void Router::handlePostPatients(const httplib::Request& req, httplib::Response& 
 										   .triage_data = deserialiseTriageData(json["triage_data"]),
 										   .demographic_data = deserialiseDemographicData(json["demographic_data"])};
 
-	uint32_t id = patientService_.addPatient(requestReceiptTime, patientClientData);
+	uint32_t id = patientService_->addPatient(requestReceiptTime, patientClientData);
 
 	// TODO: remove stub for `estimated_wait_time` at the
 	// stage 3
@@ -72,7 +72,7 @@ void Router::handlePostPatients(const httplib::Request& req, httplib::Response& 
 void Router::handleGetPatientById(const httplib::Request& req, httplib::Response& res) {
 	uint32_t id = deserialiseID(req);
 
-	const auto patient = patientService_.getPatientById(id);
+	const auto patient = patientService_->getPatientById(id);
 	if (!patient) {
 		res.status = 404;
 		res.set_content("{\"error\":\"Patient not found\"}", "application/json");
@@ -86,7 +86,7 @@ void Router::handleGetPatientById(const httplib::Request& req, httplib::Response
 }
 
 void Router::handleGetPatients(const httplib::Request& req, httplib::Response& res) {
-	const std::vector<Patient> patients = patientService_.getPatients();
+	const std::vector<Patient> patients = patientService_->getPatients();
 
 	nlohmann::json array = nlohmann::json::array();
 	for (const auto& patient : patients) {
