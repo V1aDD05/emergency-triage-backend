@@ -139,7 +139,7 @@ DemographicData deserialiseDemographicData(const nlohmann::json& json) {
 
 uint32_t deserialiseID(const httplib::Request& req) {
 	size_t idGroupIndex = 1;
-	if (req.matches.size() < idGroupIndex) {
+	if (req.matches.size() < idGroupIndex + 1) {
 		throw ValidationError("id", "Missing id in path");
 	}
 	std::string id_str = req.matches[1];
