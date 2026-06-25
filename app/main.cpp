@@ -23,6 +23,10 @@ int main() {
 	emergency_triage::Router router(patientService);
 	router.setup(server);
 	spdlog::info("Server started on {}:{}", host, port);
-	server.listen(host, port);
+	if (server.listen(host, port)) {
+		spdlog::info("Server stopped");
+	} else {
+		spdlog::error("Failed to start server on {}:{}", host, port);
+	}
 	return 0;
 }
