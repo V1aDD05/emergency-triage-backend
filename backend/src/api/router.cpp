@@ -86,7 +86,7 @@ void Router::handleGetPatientById(const httplib::Request& req, httplib::Response
 }
 
 void Router::handleGetPatients(const httplib::Request& req, httplib::Response& res) {
-	const std::vector<Patient> patients = patientService_->getPatients();
+	const auto patients = patientService_->getPatients();
 
 	nlohmann::json array = nlohmann::json::array();
 	for (const auto& patient : patients) {
