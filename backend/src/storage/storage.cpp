@@ -8,7 +8,7 @@ uint32_t PatientStorage::addPatient(std::chrono::system_clock::time_point reques
 									const PatientClientData& patientClientData, uint8_t priority,
 									PatientStatus status) {
 	++nextId_;
-	patientsStorage_.emplace(nextId_, Patient(requestReceiptTime, nextId_, patientClientData, priority, status));
+	patientsStorage_.emplace(nextId_, Patient(std::move(requestReceiptTime), nextId_, patientClientData, priority, status));
 	return nextId_;
 }
 
