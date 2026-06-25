@@ -1,0 +1,206 @@
+#include "json_serialisation.hpp"
+
+#include <chrono>
+#include <format>
+#include <limits>
+#include <string>
+#include <type_traits>
+
+#include "emergency_triage/utils/errors.hpp"
+#include "utils/error_utils.hpp"
+
+namespace {
+
+bool deserialiseBoolField(const nlohmann::json& json, const std::string& key) {
+	bool defaultValue = false;
+
+	if (!json.contains(key)) {
+		throw emergency_triage::ValidationError(key, "Missing required field");
+	}
+	auto value = json[key];
+	if (!value.is_boolean()) {
+		throw emergency_triage::ValidationError(key, "Must be a boolean");
+	}
+	return value.get<bool>();
+}
+
+template <typename T>
+
+T deserialiseUnsignedField(const nlohmann::json& json, const std::string& key) {
+	static_assert(std::is_unsigned<T>::value, "T must be an unsigned integer type");
+
+	if (!json.contains(key)) {
+		throw emergency_triage::ValidationError(key, "Missing required field");
+	}
+
+	if (!json[key].is_number_unsigned()) {
+		throw emergency_triage::ValidationError(key, "Must be a non-negative integer");
+	}
+
+	uint64_t raw = json[key].get<uint64_t>();
+	if (raw > std::numeric_limits<T>::max()) {
+		throw emergency_triage::ValidationError(
+			key, std::format("Must be in range of (0..{})", std::numeric_limits<T>::max()));
+	}
+
+	return static_cast<T>(raw);
+}
+
+template <typename T>
+
+std::optional<T> deserialiseOptionalUnsigned(const nlohmann::json& json, const std::string& key) {
+	if (!json.contains(key) || json[key].is_null()) {
+		return std::nullopt;
+	}
+	return deserialiseUnsignedField<T>(json, key);
+}
+
+std::optional<emergency_triage::Gender> deserialiseGender(const nlohmann::json& json, const std::string& key) {
+	if (!json.contains(key) || json[key].is_null()) {
+		return std::nullopt;
+	}
+
+	if (!json[key].is_string()) {
+		throw emergency_triage::ValidationError(key, "Must be a string");
+	}
+
+	std::string str = json[key];
+	if (str == "male") {
+		return emergency_triage::Gender::Male;
+	}
+	if (str == "female") {
+		return emergency_triage::Gender::Female;
+	}
+
+	throw emergency_triage::ValidationError(key, "Invalid gender value: " + str);
+}
+
+nlohmann::json serialiseEmergencyData(const emergency_triage::EmergencyData& emeregencyData) {
+	nlohmann::json json;
+	json["is_bleeding"] = emeregencyData.is_bleeding;
+	json["is_extensive_wounds"] = emeregencyData.is_extensive_wounds;
+	json["is_penetrating_wounds"] = emeregencyData.is_penetrating_wounds;
+	json["is_consciousness_depression"] = emeregencyData.is_consciousness_depression;
+	json["is_respiratory_depression"] = emeregencyData.is_respiratory_depression;
+	json["is_hemodynamic_depression"] = emeregencyData.is_hemodynamic_depression;
+	json["is_severe_combined_injury"] = emeregencyData.is_severe_combined_injury;
+	return json;
+}
+
+nlohmann::json serialiseTriageData(const emergency_triage::TriageData& triageData) {
+	nlohmann::json json;
+	json["eye_response"] = triageData.getEyeResponse();
+	json["verbal_response"] = triageData.getVerbalResponse();
+	json["motor_response"] = triageData.getMotorResponse();
+	json["respiratory_rate"] = triageData.getRespiratoryRate();
+	json["systolic_bp"] = triageData.getSystolicBP();
+	return json;
+}
+
+nlohmann::json serialiseDemographicData(const emergency_triage::DemographicData& demographicData) {
+	nlohmann::json json;
+	if (demographicData.getAge().has_value()) {
+		json["age"] = demographicData.getAge();
+	}
+	if (demographicData.getSex().has_value()) {
+		json["sex"] = (demographicData.getSex() == emergency_triage::Gender::Male) ? "male" : "female";
+	}
+	return json;
+}
+}  // namespace
+
+namespace emergency_triage {
+
+EmergencyData deserialiseEmergencyData(const nlohmann::json& json) {
+	EmergencyData result;
+	result.is_bleeding = deserialiseBoolField(json, "is_bleeding");
+	result.is_consciousness_depression = deserialiseBoolField(json, "is_consciousness_depression");
+	result.is_extensive_wounds = deserialiseBoolField(json, "is_extensive_wounds");
+	result.is_hemodynamic_depression = deserialiseBoolField(json, "is_hemodynamic_depression");
+	result.is_penetrating_wounds = deserialiseBoolField(json, "is_penetrating_wounds");
+	result.is_respiratory_depression = deserialiseBoolField(json, "is_respiratory_depression");
+	result.is_severe_combined_injury = deserialiseBoolField(json, "is_severe_combined_injury");
+	return result;
+}
+
+TriageData deserialiseTriageData(const nlohmann::json& json) {
+	TriageData result(deserialiseUnsignedField<uint8_t>(json, "eye_response"),
+					  deserialiseUnsignedField<uint8_t>(json, "verbal_response"),
+					  deserialiseUnsignedField<uint8_t>(json, "motor_response"),
+					  deserialiseUnsignedField<uint8_t>(json, "respiratory_rate"),
+					  deserialiseUnsignedField<uint16_t>(json, "systolic_bp"));
+	return result;
+}
+
+DemographicData deserialiseDemographicData(const nlohmann::json& json) {
+	DemographicData result(deserialiseOptionalUnsigned<uint8_t>(json, "age"), deserialiseGender(json, "sex"));
+	return result;
+}
+
+uint32_t deserialiseID(const httplib::Request& req) {
+	size_t idGroupIndex = 1;
+	if (req.matches.size() < idGroupIndex + 1) {
+		throw ValidationError("id", "Missing id in path");
+	}
+	std::string id_str = req.matches[1];
+
+	if (id_str.empty()) {
+		throw ValidationError("id", "Must be not empty");
+	}
+
+	if (!std::isdigit(static_cast<unsigned char>(id_str[0]))) {
+		throw ValidationError("id", "Must be a non-negative integer");
+	}
+
+	size_t pos;
+	auto id_raw = catchValidationErrors([&]() { return std::stoull(id_str, &pos); }, "body");
+	if (pos != id_str.size()) {
+		throw ValidationError("id", "Must contain only digits (no trailing characters)");
+	}
+
+	if (id_raw > std::numeric_limits<uint32_t>::max()) {
+		throw ValidationError("id", "Must be in range of <uint32_t> (0..4294967295)");
+	}
+	return static_cast<uint32_t>(id_raw);
+}
+
+nlohmann::json serialiseJSON(const Patient& patient) {
+	nlohmann::json json;
+	json["id"] = patient.getId();
+	json["priority"] = patient.getPriority();
+	json["request_receipt_time"] =
+		std::chrono::duration_cast<std::chrono::milliseconds>(patient.getRequestReceiptTime().time_since_epoch()).count();
+
+	switch (patient.getStatus()) {
+		case PatientStatus::OnTheWay:
+			json["status"] = "on_the_way";
+			break;
+		case PatientStatus::Waiting:
+			json["status"] = "waiting";
+			break;
+		case PatientStatus::InSurgery:
+			json["status"] = "in_surgery";
+			break;
+		case PatientStatus::IntensiveCare:
+			json["status"] = "intensive_care";
+			break;
+		case PatientStatus::Died:
+			json["status"] = "died";
+			break;
+	}
+
+	json["medical_data"]["emergency_params"] = serialiseEmergencyData(patient.getEmergencyData());
+	json["medical_data"]["triage_data"] = serialiseTriageData(patient.getTriageData());
+	json["medical_data"]["demography_data"] = serialiseDemographicData(patient.getDemographicData());
+
+	return json;
+}
+
+nlohmann::json serialiseJSON(const std::optional<Patient>& patient) {
+	if (!patient.has_value()) {
+		return nlohmann::json();
+	}
+	return serialiseJSON(*patient);
+}
+
+}  // namespace emergency_triage

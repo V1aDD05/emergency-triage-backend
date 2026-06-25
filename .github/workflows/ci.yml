@@ -1,0 +1,36 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - stage/*
+      - feature/*
+      - release/*
+      - hotfix/*
+  pull_request:
+    branches:
+      - main
+      - dev
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DUSE_SQLITE=OFF
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Run unit tests
+        run: cd build && ctest --output-on-failure
+      - name: Start server and smoke test
+        run: |
+          ./build/app/hospital_triage &
+          sleep 2
+          curl -f "http://${SERVER_HOST}:${SERVER_PORT}/patients" || exit 1
+        env:
+          SERVER_HOST: 127.0.0.1
+          SERVER_PORT: 8081
+          eTRIAGE_METHOD: SORT
