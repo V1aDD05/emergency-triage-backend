@@ -1,0 +1,32 @@
+#include <iostream>
+#include <memory>
+#include <string>
+
+#include <httplib.h>
+
+#include "emergency_triage/api/router.hpp"
+#include "emergency_triage/core/i_priority_calculator.hpp"
+#include "emergency_triage/services/patient_service.hpp"
+#include "emergency_triage/storage/storage.hpp"
+#include "spdlog/spdlog.h"
+
+int main() {
+	const char* host = std::getenv("SERVER_HOST") ? std::getenv("SERVER_HOST") : "127.0.0.1";
+	int port = std::getenv("SERVER_PORT") ? std::stoi(std::getenv("SERVER_PORT")) : 8080;
+	std::string triageMethod = std::getenv("TRIAGE_METHOD") ? std::getenv("TRIAGE_METHOD") : "SORT";
+	std::shared_ptr<emergency_triage::IPriorityCalculator> calculator =
+		emergency_triage::createPriorityCalculator(triageMethod);
+
+	auto storage = std::make_shared<emergency_triage::PatientStorage>();
+	auto patientService = std::make_shared<emergency_triage::PatientService>(storage, calculator);
+	httplib::Server server;
+	emergency_triage::Router router(patientService);
+	router.setup(server);
+	spdlog::info("Server started on {}:{}", host, port);
+	if (server.listen(host, port)) {
+		spdlog::info("Server stopped");
+	} else {
+		spdlog::error("Failed to start server on {}:{}", host, port);
+	}
+	return 0;
+}

@@ -1,0 +1,2 @@
+add_executable(hospital_triage main.cpp)
+target_link_libraries(hospital_triage PRIVATE hospital_backend)
