@@ -88,7 +88,7 @@
 |`demography_data_`|`DemographyData`|Демографические показатели, подробнее ([см. выше](#структура-demographydata))|
 
 ### Публичный интерфейс
-См. [здесь](/src/storage/storage.hpp)
+См. [здесь](https://github.com/V1aDD05/emergency-triage-backend/blob/main/backend/include/emergency_triage/storage/patient.hpp)
 
 ### Формат представления `request_receipt_time` в `JSON`
 Количество миллисекунд с `1970-01-01 UTC`. Например, `"timestamp": 1717588800000`

@@ -192,7 +192,7 @@ demographicData.setAge(newAge);
 - `bugfix/*` - для исправления ошибок.
 - `release/*` - подготовка релиза. Создаются от `dev`, сливаются в `main` и `dev`.
 - `hotfix/*` - для срочных исправлений. Сливаются в `main` и `dev`.
-
+    
 ## Стиль коммитов
 Начиная с `v0.1.0` коммиты следуют [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), конфигурацию [@commitlint/config-conventional](https://www.npmjs.com/package/@commitlint/config-conventional). Ниже приведена таблица применяемых типов:
 
