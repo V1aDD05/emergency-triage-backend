@@ -3,57 +3,124 @@
 Содержит [визуализацию](#основные-взаимосвязи-в-проекте) файлов и основных взаимосвязей в проекте.
 Содержит описание следующих основных компонентов: [хранилища](#хранилище), [API](#http-api).
 
+## Слои приложения
+
+Приложение построено по многослойной архитектуре. Запрос проходит через слои сверху вниз:
+
+```mermaid
+flowchart TD
+    Client[Клиент] -->|HTTP-запрос| Router
+
+    subgraph HTTP["HTTP-слой"]
+        Router["Router\n(маршрутизация, парсинг,\nсериализация, обработка исключений)"]
+    end
+
+    subgraph Service["Сервисный слой"]
+        PS["PatientService\n(координация бизнес-логики\nи хранилища, бизнес-правила)"]
+    end
+
+    subgraph Business["Бизнес-логика"]
+        Calc["IPriorityCalculator\n(алгоритм триажа SORT)"]
+    end
+
+    subgraph Storage["Хранилище"]
+        Store["IPatientStorage\n(in-memory / SQLite)"]
+    end
+
+    subgraph Domain["Доменные модели"]
+        Patient["Patient"]
+        DTO["EmergencyData, TriageData,\nDemographicData"]
+    end
+
+    Router -->|вызов метода| PS
+    PS -->|computePriority| Calc
+    PS -->|addPatient / getPatient| Store
+    Store -->|хранит| Patient
+    Patient -->|содержит| DTO
+```
+
+**Роли слоёв:**
+
+| Слой | Ответственность | Не знает о |
+|------|-----------------|------------|
+| **HTTP** | Маршрутизация, парсинг JSON, десериализация, сериализация, HTTP-статусы, обработка исключений | Бизнес-правилах, хранилище, алгоритмах |
+| **Сервисный** | Координация бизнес-логики и хранилища, бизнес-правила (статус `OnTheWay`, атомарность) | HTTP, JSON, конкретных реализациях |
+| **Бизнес-логика** | Вычисление приоритета по алгоритму триажа | HTTP, хранилище, сервисах |
+| **Хранилище** | Сохранение и извлечение `Patient` | Бизнес-логике, HTTP |
+| **Доменные модели** | Хранение данных и валидация инвариантов | Всём, что выше |
+
 ## Основные взаимосвязи в проекте на этапе 1
 
 ```mermaid
 flowchart TD
     subgraph "Точка входа"
-        M["main.cpp\nЗапуск сервера,\nсоздание хранилища"]
+        M["main.cpp\nЗапуск сервера,\nсоздание зависимостей\n(composition root)"]
     end
 
     subgraph "HTTP API"
-        A["handlers.hpp/.cpp\nОбработчики запросов"]
-        
+        R["router.hpp/.cpp\nRouter: маршрутизация,\nтонкие обработчики,\nобработка исключений"]
+    end
+
+    subgraph "Сервисный слой"
+        S["patient_service.hpp/.cpp\nPatientService:\nкоординация бизнес-логики\nи хранилища"]
     end
 
     subgraph "Бизнес-логика"
-        D["triage.hpp/.cpp\nВычисление приоритета\nдля пострадавшего"]
+        C["i_priority_calculator.hpp\nIPriorityCalculator"]
+        SC["sort_priority_calculator.hpp\nSORTPriorityCalculator"]
+        F["priority_calculator_factory.cpp\ncreatePriorityCalculator()"]
     end
 
-    subgraph "In-memory хранилище"
-        E["storage.hpp/.cpp\nКласс хранилища"]
+    subgraph "Хранилище"
+        IS["storage.hpp\nIPatientStorage"]
+        ES["storage.cpp\nPatientStorage"]
     end
 
-    subgraph "Структуры данных"
-        F["src/storage/data_structures.hpp\nДругие классы и DTO структуры данных"]
-        G["src/storage/patient.hpp/.cpp\nКласс `Patient`"]
+    subgraph "Доменные модели"
+        DS["data_structures.hpp\nEmergencyData, TriageData,\nDemographicData, PatientClientData"]
+        P["patient.hpp/.cpp\nPatient"]
     end
 
     subgraph "Утилиты"
-        B["json_serialisation.hpp/.cpp\nСериализация и десериализация\nпри работе с JSON"]
+        JS["json_serialisation.hpp/.cpp\nСериализация/десериализация"]
     end
 
     subgraph "Обработка ошибок"
-        C["errors.hpp\nИерархия классов исключений"]
-        H["error_utils.hpp\nВспомогательные функции для работы с исключениями"]
+        E["errors.hpp\nИерархия исключений"]
+        EU["error_utils.hpp\ncatchValidationErrors()"]
     end
 
-    M --> A
-    M --> E
-    A --> B
-    B --> C
-    A --> C
-    A --> D
-    A --> E
-    E --> F
-    E --> G
-    B --> F
-    G --> B
-    A --> H
-    B --> H
-
+    M --> R
+    M --> S
+    M --> C
+    M --> IS
+    M --> F
+    R --> S
+    R --> JS
+    R --> E
+    R --> EU
+    S --> C
+    S --> IS
+    IS --> P
+    P --> DS
+    JS --> DS
+    JS --> P
+    JS --> E
+    F --> C
+    F --> SC
+    SC --> C
+    ES --> IS
 ```
 
+**Поток выполнения `POST /patients`:**
+1. `main` создаёт `PatientStorage`, калькулятор через фабрику и `PatientService`, внедряя зависимости.
+2. `Router` регистрирует маршруты на `httplib::Server`.
+3. Клиент отправляет `POST /patients` с JSON.
+4. `Router::handlePostPatients` парсит JSON, десериализует в `PatientClientData`.
+5. Вызывает `PatientService::addPatient`.
+6. Сервис устанавливает статус, вызывает `IPriorityCalculator::computePriority`, затем `IPatientStorage::addPatient`.
+7. Хранилище создаёт `Patient` и сохраняет его.
+8. `Router` формирует JSON-ответ и возвращает клиенту с кодом 201.
 
 ## Хранилище
 Базовый класс - `IPatientStorage`. От него на данном этапе наследуется класс in-memory хранилища `PatientStorage`, подробнее [см.здесь](src/storage/storage.hpp).
