@@ -8,6 +8,7 @@ on:
       - feature/*
       - release/*
       - hotfix/*
+      - bugfix/*
   pull_request:
     branches:
       - main
@@ -33,4 +34,4 @@ jobs:
         env:
           SERVER_HOST: 127.0.0.1
           SERVER_PORT: 8081
-          eTRIAGE_METHOD: SORT
+          TRIAGE_METHOD: SORT
